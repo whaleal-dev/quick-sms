@@ -13,6 +13,9 @@ import java.util.Map;
 /**
  * Webhook 解析门面（回执 / 上行 / 状态查询 / 号码校验）
  * <p>需要调用厂商 API 的方法须动态传入 {@link SmsCredentials}。</p>
+ *
+ * @author whaleal-dev
+ * @author 恒哥
  */
 public interface SmsWebhookHandler {
 
@@ -31,6 +34,15 @@ public interface SmsWebhookHandler {
     PhoneValidationResult validatePhone(SmsProviderType provider, String phoneNumber, SmsCredentials credentials);
 
     List<PhoneValidationResult> validatePhones(SmsProviderType provider, List<String> phoneNumbers, SmsCredentials credentials);
+
+    /**
+     * 校验 Webhook 签名与防重放。
+     *
+     * @return null 表示通过；否则为统一错误码（如 E005/E006）
+     */
+    default String verifyWebhook(long timestampMs, String nonce, String rawBody, String signature) {
+        return null;
+    }
 
     /** 解析用基础配置（不含秘钥，由 SDK 内部持有） */
     SmsProviderConfig getBaseConfig();

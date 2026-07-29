@@ -1,0 +1,2 @@
+com.whaleal.ark.cloud.third.sms.provider.twilio.TwilioPhoneValidator
+com.whaleal.ark.cloud.third.sms.provider.vonage.VonagePhoneValidator

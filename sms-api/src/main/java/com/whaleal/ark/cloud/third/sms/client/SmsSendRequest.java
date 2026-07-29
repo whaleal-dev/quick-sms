@@ -49,6 +49,12 @@ public class SmsSendRequest {
      */
     private SmsCredentials credentials;
 
-    /** 短信供应商（除 MOCK 外建议每次请求显式指定） */
+    /** 短信供应商（核心通道枚举；与 {@link #providerCode} 二选一或同时指定） */
     private SmsProviderType provider;
+
+    /**
+     * 扩展供应商编码（无需改枚举）。
+     * <p>优先于 {@link #provider} 用于 SPI 查找；未设置时回退到 {@code provider.getCode()}。</p>
+     */
+    private String providerCode;
 }

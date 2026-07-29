@@ -1,0 +1,9 @@
+com.whaleal.ark.cloud.third.sms.provider.aliyun_intl.AliyunInternationalReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.aws.AwsSnsReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.huawei_intl.HuaweiInternationalReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.infobip.InfobipReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.messagebird.MessageBirdReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.plivo.PlivoReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.tencent_intl.TencentInternationalReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.twilio.TwilioReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.vonage.VonageReceiptParser

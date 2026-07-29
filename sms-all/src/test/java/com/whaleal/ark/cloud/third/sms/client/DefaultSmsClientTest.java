@@ -5,6 +5,8 @@ import com.whaleal.ark.cloud.third.sms.enums.SmsProviderType;
 import com.whaleal.ark.cloud.third.sms.outbound.entity.SmsOutboundMessage;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DefaultSmsClientTest {
@@ -102,5 +104,24 @@ class DefaultSmsClientTest {
 
         assertThat(DefaultSmsClient.resolveCallbackUrl(SmsSendRequest.builder().build(), config))
                 .isEqualTo("https://global.example.com/callback");
+    }
+
+    @Test
+    void sendText_shortcut_withMock_returnsSuccess() {
+        SmsClient client = SmsClients.builder().provider(SmsProviderType.MOCK).build();
+
+        SmsSendResult result = client.sendText("+8613800138000", "hello shortcut");
+
+        assertThat(result.isSuccess()).isTrue();
+        assertThat(result.getMessageId()).isNotBlank();
+    }
+
+    @Test
+    void sendTemplate_shortcut_withMock_returnsSuccess() {
+        SmsClient client = SmsClients.builder().provider(SmsProviderType.MOCK).build();
+
+        SmsSendResult result = client.sendTemplate("+8613800138000", "TPL_001", Map.of("code", "1234"));
+
+        assertThat(result.isSuccess()).isTrue();
     }
 }

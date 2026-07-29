@@ -1,0 +1,17 @@
+com.whaleal.ark.cloud.third.sms.provider.aliyun.AliyunInboundParser
+com.whaleal.ark.cloud.third.sms.provider.baidu.BaiduInboundParser
+com.whaleal.ark.cloud.third.sms.provider.china_mobile.ChinaMobileInboundParser
+com.whaleal.ark.cloud.third.sms.provider.china_telecom.ChinaTelecomInboundParser
+com.whaleal.ark.cloud.third.sms.provider.china_unicom.ChinaUnicomInboundParser
+com.whaleal.ark.cloud.third.sms.provider.chuanglan.ChuanglanInboundParser
+com.whaleal.ark.cloud.third.sms.provider.cloopen.CloopenInboundParser
+com.whaleal.ark.cloud.third.sms.provider.ctyun.CtyunInboundParser
+com.whaleal.ark.cloud.third.sms.provider.custom_http.CustomHttpInboundParser
+com.whaleal.ark.cloud.third.sms.provider.huawei.HuaweiInboundParser
+com.whaleal.ark.cloud.third.sms.provider.luosimao.LuosimaoInboundParser
+com.whaleal.ark.cloud.third.sms.provider.netease.NeteaseInboundParser
+com.whaleal.ark.cloud.third.sms.provider.qiniu.QiniuInboundParser
+com.whaleal.ark.cloud.third.sms.provider.submail.SubmailInboundParser
+com.whaleal.ark.cloud.third.sms.provider.tencent.TencentInboundParser
+com.whaleal.ark.cloud.third.sms.provider.yunpian.YunpianInboundParser
+com.whaleal.ark.cloud.third.sms.provider.zhutong.ZhutongInboundParser

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.whaleal.third</groupId>
+        <artifactId>quick-sms</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>sms-core</artifactId>
+    <packaging>jar</packaging>
+    <name>SMS Core</name>
+    <description>短信 SDK 公共核心：SPI 加载、通用工具、厂商实现侧共享抽象（供 runtime / providers 使用）</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.whaleal.third</groupId>
+            <artifactId>sms-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

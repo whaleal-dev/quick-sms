@@ -1,6 +1,7 @@
 package com.whaleal.ark.cloud.third.sms.receipt.adapter;
 
 import com.whaleal.ark.cloud.third.sms.config.SmsProviderConfig;
+import com.whaleal.ark.cloud.third.sms.enums.SmsProviderKeys;
 import com.whaleal.ark.cloud.third.sms.enums.SmsProviderType;
 import com.whaleal.ark.cloud.third.sms.receipt.entity.SmsReceipt;
 import com.whaleal.ark.cloud.third.sms.receipt.parser.GenericReceiptParser;
@@ -22,7 +23,7 @@ import java.util.Map;
 @Slf4j
 public class ReceiptAdapter {
 
-    private final Map<SmsProviderType, ReceiptParser> parserMap;
+    private final Map<String, ReceiptParser> parserMap;
     private final GenericReceiptParser genericParser;
 
     public ReceiptAdapter() {
@@ -35,7 +36,8 @@ public class ReceiptAdapter {
      * 初始化各提供商的解析器
      */
     private void initializeParsers() {
-        parserMap.put(SmsProviderType.MOCK, new MockReceiptParser());
+        MockReceiptParser mock = new MockReceiptParser();
+        parserMap.put(SmsProviderKeys.normalize(mock.getSupportedProvider()), mock);
         parserMap.putAll(SmsExtensionLoader.loadProviders(ReceiptParser.class, ReceiptParser::getSupportedProvider));
         log.info("回执解析器初始化完成，支持 {} 个提供商", parserMap.size());
     }
@@ -52,7 +54,7 @@ public class ReceiptAdapter {
         try {
             log.debug("开始解析回执数据，提供商: {}", providerType);
 
-            ReceiptParser parser = parserMap.get(providerType);
+            ReceiptParser parser = parserMap.get(SmsProviderKeys.of(providerType));
             if (parser == null) {
                 log.warn("未找到提供商 {} 的专用解析器，使用通用解析器", providerType);
                 parser = genericParser;
@@ -164,7 +166,7 @@ public class ReceiptAdapter {
      * @return 是否支持
      */
     public boolean isSupported(SmsProviderType providerType) {
-        return parserMap.containsKey(providerType);
+        return isSupported(SmsProviderKeys.of(providerType));
     }
 
     /**
@@ -172,7 +174,21 @@ public class ReceiptAdapter {
      *
      * @return 支持的提供商类型数组
      */
+    public java.util.Set<String> getSupportedProviderCodes() {
+        return java.util.Set.copyOf(parserMap.keySet());
+    }
+
+    /** @deprecated 请使用 {@link #getSupportedProviderCodes()} */
+    @Deprecated
     public SmsProviderType[] getSupportedProviders() {
-        return parserMap.keySet().toArray(new SmsProviderType[0]);
+        return parserMap.keySet().stream()
+                .map(SmsProviderType::tryFromCode)
+                .flatMap(java.util.Optional::stream)
+                .toArray(SmsProviderType[]::new);
+    }
+
+    public boolean isSupported(String providerCode) {
+        String key = SmsProviderKeys.normalize(providerCode);
+        return key != null && parserMap.containsKey(key);
     }
 }

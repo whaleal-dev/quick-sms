@@ -1,8 +1,17 @@
 package com.whaleal.ark.cloud.third.sms.enums;
 
+import java.util.Optional;
+
 /**
- * SMS服务提供商类型枚举
+ * SMS 核心服务提供商类型枚举。
+ * <p>
+ * <b>扩展约定（2C）</b>：本枚举只收录稳定核心通道。
+ * 新增厂商不必改此枚举——在 {@code sms-providers-cn} / {@code sms-providers-intl}
+ * 的 {@code provider.<vendor>} 包中实现 SPI，{@code getSupportedProvider()} 返回小写 code（如 {@code yunpian}），
+ * 请求侧可通过 {@code providerCode} 指定。参见 {@link SmsProviderKeys}。
  *
+ * @author whaleal-dev
+ * @author 恒哥
  */
 public enum SmsProviderType {
 
@@ -89,7 +98,37 @@ public enum SmsProviderType {
     /**
      * Infobip
      */
-    INFOBIP("infobip", "Infobip", "全球优先");
+    INFOBIP("infobip", "Infobip", "全球优先"),
+
+    /** 云片 */
+    YUNPIAN("yunpian", "云片", "中国优先"),
+
+    /** 创蓝 / 253 云通讯 */
+    CHUANGLAN("chuanglan", "创蓝", "中国优先"),
+
+    /** 容联云通讯 */
+    CLOOPEN("cloopen", "容联云", "中国优先"),
+
+    /** 七牛云短信 */
+    QINIU("qiniu", "七牛云", "中国优先"),
+
+    /** 螺丝帽 */
+    LUOSIMAO("luosimao", "螺丝帽", "中国优先"),
+
+    /** SUBMAIL */
+    SUBMAIL("submail", "SUBMAIL", "中国优先"),
+
+    /** 天翼云短信 */
+    CTYUN("ctyun", "天翼云", "中国优先"),
+
+    /** 网易云信 */
+    NETEASE("netease", "网易云信", "中国优先"),
+
+    /** 百度云短信 */
+    BAIDU("baidu", "百度云", "中国优先"),
+
+    /** 助通短信 */
+    ZHUTONG("zhutong", "助通", "中国优先");
 
     private final String code;
     private final String displayName;
@@ -119,12 +158,24 @@ public enum SmsProviderType {
      * @return 枚举值
      */
     public static SmsProviderType fromCode(String code) {
+        return tryFromCode(code)
+                .orElseThrow(() -> new IllegalArgumentException("未知的SMS提供商类型: " + code));
+    }
+
+    /**
+     * 尝试按 code / 枚举名解析；扩展厂商未入枚举时返回 empty。
+     */
+    public static Optional<SmsProviderType> tryFromCode(String code) {
+        String normalized = SmsProviderKeys.normalize(code);
+        if (normalized == null) {
+            return Optional.empty();
+        }
         for (SmsProviderType type : values()) {
-            if (type.code.equals(code)) {
-                return type;
+            if (type.code.equals(normalized) || type.name().equalsIgnoreCase(normalized)) {
+                return Optional.of(type);
             }
         }
-        throw new IllegalArgumentException("未知的SMS提供商类型: " + code);
+        return Optional.empty();
     }
 
     /**
@@ -165,6 +216,9 @@ public enum SmsProviderType {
     public boolean isDomesticProvider() {
         return this == ALIYUN || this == TENCENT || this == HUAWEI ||
                this == CHINA_MOBILE || this == CHINA_TELECOM || this == CHINA_UNICOM ||
-               this == CUSTOM_HTTP; // 自定义HTTP接口可配置为国内短信
+               this == YUNPIAN || this == CHUANGLAN || this == CLOOPEN ||
+               this == QINIU || this == LUOSIMAO || this == SUBMAIL ||
+               this == CTYUN || this == NETEASE || this == BAIDU || this == ZHUTONG ||
+               this == CUSTOM_HTTP;
     }
 }

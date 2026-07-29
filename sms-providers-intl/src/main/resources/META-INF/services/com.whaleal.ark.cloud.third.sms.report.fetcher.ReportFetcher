@@ -1,0 +1,6 @@
+com.whaleal.ark.cloud.third.sms.provider.aws.AwsSnsReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.infobip.InfobipReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.messagebird.MessageBirdReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.plivo.PlivoReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.twilio.TwilioReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.vonage.VonageReportFetcher

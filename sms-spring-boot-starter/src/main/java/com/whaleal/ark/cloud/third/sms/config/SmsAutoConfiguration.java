@@ -7,6 +7,8 @@ import com.whaleal.ark.cloud.third.sms.client.SmsWebhookHandler;
 import com.whaleal.ark.cloud.third.sms.core.SmsModuleManager;
 import com.whaleal.ark.cloud.third.sms.enums.SmsProviderType;
 import com.whaleal.ark.cloud.third.sms.inbound.adapter.InboundAdapter;
+import com.whaleal.ark.cloud.third.sms.metrics.CollectorSmsMetrics;
+import com.whaleal.ark.cloud.third.sms.metrics.SmsMetrics;
 import com.whaleal.ark.cloud.third.sms.outbound.adapter.OutboundAdapter;
 import com.whaleal.ark.cloud.third.sms.receipt.adapter.ReceiptAdapter;
 import com.whaleal.ark.cloud.third.sms.report.adapter.ReportAdapter;
@@ -17,9 +19,9 @@ import org.springframework.context.annotation.Bean;
 
 /**
  * SMS SDK Spring Boot 自动配置（仅注册 Bean，不读取 application.yml）
- * <p>
- * 默认提供 MOCK 的 {@link SmsClient}；业务方通过自定义 {@code @Bean} 覆盖，
- * 或在每次 {@link com.whaleal.ark.cloud.third.sms.client.SmsSendRequest} 中指定 provider 与 credentials。
+ *
+ * @author whaleal-dev
+ * @author 恒哥
  */
 @AutoConfiguration
 public class SmsAutoConfiguration {
@@ -64,14 +66,23 @@ public class SmsAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean(SmsMetrics.class)
+    public SmsMetrics smsMetrics() {
+        return CollectorSmsMetrics.INSTANCE;
+    }
+
+    @Bean
     @ConditionalOnMissingBean(SmsClient.class)
-    public SmsClient smsClient(SmsModuleManager smsModuleManager) {
+    public SmsClient smsClient(SmsModuleManager smsModuleManager, SmsMetrics smsMetrics) {
         return new DefaultSmsClient(
                 SmsProviderConfig.builder()
                         .providerType(SmsProviderType.MOCK)
                         .name(SmsProviderType.MOCK.getDisplayName())
                         .build(),
-                smsModuleManager);
+                smsModuleManager,
+                null,
+                null,
+                smsMetrics);
     }
 
     @Bean

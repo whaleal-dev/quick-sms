@@ -20,6 +20,7 @@ import java.util.Map;
  * 统一管理四个独立模块：Receipt（回执）、Inbound（上行）、Report（状态报告）、Outbound（下行）
  * 
  * @author whaleal-dev
+ * @author 恒哥
  * @since 1.0.0
  */
 @Slf4j
@@ -136,6 +137,14 @@ public class SmsModuleManager {
         log.debug("发送短信，提供商: {}, 接收方: {}", providerType, message.getTo());
         return outboundAdapter.sendMessage(providerType, message, config);
     }
+
+    /**
+     * 按扩展 providerCode 发送（无需枚举）。
+     */
+    public SmsOutboundMessage sendMessage(String providerCode, SmsOutboundMessage message, SmsProviderConfig config) {
+        log.debug("发送短信，提供商 code: {}, 接收方: {}", providerCode, message.getTo());
+        return outboundAdapter.sendMessage(providerCode, message, config);
+    }
     
     /**
      * 批量发送短信
@@ -152,6 +161,15 @@ public class SmsModuleManager {
         log.debug("发送模板短信，提供商: {}, 模板ID: {}", providerType, 
                 message.getBusinessInfo() != null ? message.getBusinessInfo().getTemplateId() : "未知");
         return outboundAdapter.sendTemplateMessage(providerType, message, config);
+    }
+
+    public SmsOutboundMessage sendTemplateMessage(String providerCode, SmsOutboundMessage message, SmsProviderConfig config) {
+        // 扩展厂商：走普通发送入口，由适配器按 code 查找 SPI
+        log.debug("发送模板短信，提供商 code: {}", providerCode);
+        SmsProviderConfig keyed = config == null
+                ? SmsProviderConfig.builder().providerCode(providerCode).build()
+                : config.toBuilder().providerCode(providerCode).build();
+        return outboundAdapter.sendMessage(providerCode, message, keyed);
     }
     
     // ==================== 模块支持检查 ====================

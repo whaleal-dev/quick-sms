@@ -1,0 +1,17 @@
+com.whaleal.ark.cloud.third.sms.provider.aliyun.AliyunReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.baidu.BaiduReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.china_mobile.ChinaMobileReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.china_telecom.ChinaTelecomReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.china_unicom.ChinaUnicomReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.chuanglan.ChuanglanReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.cloopen.CloopenReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.ctyun.CtyunReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.custom_http.CustomHttpReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.huawei.HuaweiReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.luosimao.LuosimaoReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.netease.NeteaseReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.qiniu.QiniuReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.submail.SubmailReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.tencent.TencentReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.yunpian.YunpianReceiptParser
+com.whaleal.ark.cloud.third.sms.provider.zhutong.ZhutongReceiptParser

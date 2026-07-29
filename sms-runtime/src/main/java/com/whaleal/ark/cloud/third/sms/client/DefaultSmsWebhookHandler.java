@@ -8,25 +8,38 @@ import com.whaleal.ark.cloud.third.sms.receipt.entity.SmsReceipt;
 import com.whaleal.ark.cloud.third.sms.report.entity.SmsReport;
 import com.whaleal.ark.cloud.third.sms.validation.PhoneValidationAdapter;
 import com.whaleal.ark.cloud.third.sms.validation.entity.PhoneValidationResult;
+import com.whaleal.ark.cloud.third.sms.webhook.WebhookSecurity;
 
 import java.util.List;
 import java.util.Map;
 
 /**
  * {@link SmsWebhookHandler} 默认实现
+ *
+ * @author whaleal-dev
+ * @author 恒哥
  */
 public class DefaultSmsWebhookHandler implements SmsWebhookHandler {
 
     private final SmsModuleManager moduleManager;
     private final PhoneValidationAdapter phoneValidationAdapter;
     private final SmsProviderConfig baseConfig;
+    private final WebhookSecurity webhookSecurity;
 
     public DefaultSmsWebhookHandler(SmsModuleManager moduleManager,
                                     PhoneValidationAdapter phoneValidationAdapter,
                                     SmsProviderConfig baseConfig) {
+        this(moduleManager, phoneValidationAdapter, baseConfig, null);
+    }
+
+    public DefaultSmsWebhookHandler(SmsModuleManager moduleManager,
+                                    PhoneValidationAdapter phoneValidationAdapter,
+                                    SmsProviderConfig baseConfig,
+                                    WebhookSecurity webhookSecurity) {
         this.moduleManager = moduleManager;
         this.phoneValidationAdapter = phoneValidationAdapter;
         this.baseConfig = baseConfig;
+        this.webhookSecurity = webhookSecurity;
     }
 
     @Override
@@ -67,6 +80,14 @@ public class DefaultSmsWebhookHandler implements SmsWebhookHandler {
     @Override
     public List<PhoneValidationResult> validatePhones(SmsProviderType provider, List<String> phoneNumbers, SmsCredentials credentials) {
         return phoneValidationAdapter.validateBatch(provider, phoneNumbers, withCredentials(credentials));
+    }
+
+    @Override
+    public String verifyWebhook(long timestampMs, String nonce, String rawBody, String signature) {
+        if (webhookSecurity == null) {
+            return null;
+        }
+        return webhookSecurity.verify(timestampMs, nonce, rawBody, signature);
     }
 
     @Override

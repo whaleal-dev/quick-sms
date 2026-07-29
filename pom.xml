@@ -12,12 +12,12 @@
     </parent>
 
     <groupId>com.whaleal.third</groupId>
-    <artifactId>whaleal-sms-sdk</artifactId>
+    <artifactId>quick-sms</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
 
-    <name>Whaleal SMS SDK</name>
-    <description>多供应商短信服务 SDK - 支持 17+ 供应商，Spring Boot 开箱即用</description>
+    <name>Quick SMS</name>
+    <description>多供应商短信服务 SDK - 国内/国际分模块，Spring Boot 开箱即用</description>
     <url>https://whaleal.com</url>
 
     <organization>
@@ -25,10 +25,40 @@
         <url>https://whaleal.com</url>
     </organization>
 
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>whaleal-dev</id>
+            <name>whaleal-dev</name>
+            <organization>whaleal</organization>
+            <organizationUrl>https://whaleal.com</organizationUrl>
+        </developer>
+        <developer>
+            <id>hengge</id>
+            <name>恒哥</name>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/whaleal-dev/quick-sms.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/whaleal-dev/quick-sms.git</developerConnection>
+        <url>https://github.com/whaleal-dev/quick-sms</url>
+        <tag>HEAD</tag>
+    </scm>
+
     <modules>
         <module>sms-api</module>
+        <module>sms-core</module>
         <module>sms-runtime</module>
-        <module>sms-providers</module>
+        <module>sms-providers-cn</module>
+        <module>sms-providers-intl</module>
         <module>sms-spring-boot-starter</module>
         <module>sms-all</module>
     </modules>
@@ -55,12 +85,22 @@
             </dependency>
             <dependency>
                 <groupId>com.whaleal.third</groupId>
+                <artifactId>sms-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.whaleal.third</groupId>
                 <artifactId>sms-runtime</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.whaleal.third</groupId>
-                <artifactId>sms-providers</artifactId>
+                <artifactId>sms-providers-cn</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.whaleal.third</groupId>
+                <artifactId>sms-providers-intl</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -126,8 +166,15 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+        </plugins>
     </build>
 
+    <!-- 默认仍可发到 GitHub Packages；Maven Central 走 -Pcentral -->
     <distributionManagement>
         <repository>
             <id>github-whaleal-dev</id>
@@ -138,5 +185,82 @@
             <url>https://maven.pkg.github.com/whaleal-dev/ark-nexus</url>
         </snapshotRepository>
     </distributionManagement>
+
+    <profiles>
+        <!--
+          Maven Central（Sonatype Central Portal）发布。
+          CI：push release-* → mvn -Pcentral deploy
+          本地：mvn -Pcentral clean deploy
+        -->
+        <profile>
+            <id>central</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.3.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.11.2</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <doclint>none</doclint>
+                                    <failOnError>false</failOnError>
+                                    <quiet>true</quiet>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.2.7</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <gpgArguments>
+                                <arg>--pinentry-mode</arg>
+                                <arg>loopback</arg>
+                            </gpgArguments>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.9.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <autoPublish>true</autoPublish>
+                            <waitUntil>published</waitUntil>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

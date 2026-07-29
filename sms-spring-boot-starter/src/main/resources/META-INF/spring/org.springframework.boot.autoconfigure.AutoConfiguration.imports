@@ -1,1 +1,2 @@
+com.whaleal.ark.cloud.third.sms.config.SmsMicrometerAutoConfiguration
 com.whaleal.ark.cloud.third.sms.config.SmsAutoConfiguration

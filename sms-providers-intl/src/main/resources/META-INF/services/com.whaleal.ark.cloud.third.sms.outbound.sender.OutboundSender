@@ -1,0 +1,9 @@
+com.whaleal.ark.cloud.third.sms.provider.aliyun_intl.AliyunInternationalOutboundSender
+com.whaleal.ark.cloud.third.sms.provider.aws.AwsOutboundSender
+com.whaleal.ark.cloud.third.sms.provider.huawei_intl.HuaweiInternationalOutboundSender
+com.whaleal.ark.cloud.third.sms.provider.infobip.InfobipOutboundSender
+com.whaleal.ark.cloud.third.sms.provider.messagebird.MessageBirdOutboundSender
+com.whaleal.ark.cloud.third.sms.provider.plivo.PlivoOutboundSender
+com.whaleal.ark.cloud.third.sms.provider.tencent_intl.TencentInternationalOutboundSender
+com.whaleal.ark.cloud.third.sms.provider.twilio.TwilioOutboundSender
+com.whaleal.ark.cloud.third.sms.provider.vonage.VonageOutboundSender

@@ -16,6 +16,7 @@ import java.util.UUID;
  * 用于测试和开发环境的模拟短信发送
  * 
  * @author whaleal-dev
+ * @author 恒哥
  * @since 1.0.0
  */
 @Slf4j
@@ -67,18 +68,21 @@ public class MockOutboundSender implements OutboundSender {
     
     @Override
     public SmsOutboundMessage sendTemplateMessage(SmsOutboundMessage message, SmsProviderConfig config) {
-        log.info("Mock发送模板短信 - 模板ID: {}", 
+        log.info("Mock发送模板短信 - 模板ID: {}",
                 message.getBusinessInfo() != null ? message.getBusinessInfo().getTemplateId() : "未知");
-        
-        // 模拟模板参数替换
+
+        String content = message.getContent();
+        if (content == null || content.isBlank()) {
+            String templateId = message.getBusinessInfo() != null ? message.getBusinessInfo().getTemplateId() : "unknown";
+            content = "[MOCK_TEMPLATE:" + templateId + "]";
+        }
         if (message.getBusinessInfo() != null && message.getBusinessInfo().getTemplateParams() != null) {
-            String content = message.getContent();
             for (Map.Entry<String, String> entry : message.getBusinessInfo().getTemplateParams().entrySet()) {
                 content = content.replace("${" + entry.getKey() + "}", entry.getValue());
             }
-            message.setContent(content);
         }
-        
+        message.setContent(content);
+
         return sendMessage(message, config);
     }
     

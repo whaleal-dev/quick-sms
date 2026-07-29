@@ -6,14 +6,14 @@
 
     <parent>
         <groupId>com.whaleal.third</groupId>
-        <artifactId>whaleal-sms-sdk</artifactId>
+        <artifactId>quick-sms</artifactId>
         <version>1.0.0</version>
     </parent>
 
     <artifactId>sms-api</artifactId>
     <packaging>jar</packaging>
     <name>SMS API</name>
-    <description>短信 SDK API 层：接口、DTO、枚举、异常（零 Spring）</description>
+    <description>短信 SDK API：对外稳定契约（门面、SPI 接口、DTO、核心枚举、异常）</description>
 
     <dependencies>
         <dependency>

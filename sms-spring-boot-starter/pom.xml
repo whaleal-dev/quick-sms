@@ -6,14 +6,14 @@
 
     <parent>
         <groupId>com.whaleal.third</groupId>
-        <artifactId>whaleal-sms-sdk</artifactId>
+        <artifactId>quick-sms</artifactId>
         <version>1.0.0</version>
     </parent>
 
     <artifactId>sms-spring-boot-starter</artifactId>
     <packaging>jar</packaging>
     <name>SMS Spring Boot Starter</name>
-    <description>短信 SDK Spring Boot 自动配置</description>
+    <description>短信 SDK Spring Boot 自动配置（仅 api + runtime，厂商请按需引入 sms-providers-cn / sms-providers-intl）</description>
 
     <dependencies>
         <dependency>
@@ -23,6 +23,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 

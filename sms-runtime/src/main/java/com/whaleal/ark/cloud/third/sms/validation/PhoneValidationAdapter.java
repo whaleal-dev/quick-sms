@@ -1,6 +1,7 @@
 package com.whaleal.ark.cloud.third.sms.validation;
 
 import com.whaleal.ark.cloud.third.sms.config.SmsProviderConfig;
+import com.whaleal.ark.cloud.third.sms.enums.SmsProviderKeys;
 import com.whaleal.ark.cloud.third.sms.enums.SmsProviderType;
 import com.whaleal.ark.cloud.third.sms.validation.entity.PhoneValidationResult;
 import com.whaleal.ark.cloud.third.sms.spi.SmsExtensionLoader;
@@ -18,12 +19,13 @@ import java.util.stream.Collectors;
  * 统一管理各种号码校验器，提供统一的校验接口
  * 
  * @author whaleal-dev
+ * @author 恒哥
  * @since 1.0.0
  */
 @Slf4j
 public class PhoneValidationAdapter {
     
-    private final Map<SmsProviderType, PhoneValidator> validators = new ConcurrentHashMap<>();
+    private final Map<String, PhoneValidator> validators = new ConcurrentHashMap<>();
     
     public PhoneValidationAdapter() {
         initializeValidators();
@@ -33,8 +35,8 @@ public class PhoneValidationAdapter {
      * 初始化所有校验器
      */
     private void initializeValidators() {
-        validators.put(SmsProviderType.MOCK, new LocalPhoneValidator());
-        validators.put(SmsProviderType.CUSTOM_HTTP, new GooglePhoneValidator());
+        validators.put(SmsProviderKeys.of(SmsProviderType.MOCK), new LocalPhoneValidator());
+        validators.put(SmsProviderKeys.of(SmsProviderType.CUSTOM_HTTP), new GooglePhoneValidator());
         validators.putAll(SmsExtensionLoader.loadProviders(PhoneValidator.class, PhoneValidator::getSupportedProvider));
         log.info("号码校验适配器初始化完成，支持的校验器: {}", validators.keySet());
     }
@@ -53,10 +55,10 @@ public class PhoneValidationAdapter {
             return createErrorResult(phoneNumber, "号码不能为空");
         }
         
-        PhoneValidator validator = validators.get(providerType);
+        PhoneValidator validator = validators.get(SmsProviderKeys.of(providerType));
         if (validator == null) {
             // 降级到本地校验器
-            validator = validators.get(SmsProviderType.MOCK);
+            validator = validators.get(SmsProviderKeys.of(SmsProviderType.MOCK));
             if (validator == null) {
                 return createErrorResult(phoneNumber, "不支持的校验器类型: " + providerType);
             }
@@ -96,10 +98,10 @@ public class PhoneValidationAdapter {
             return Collections.emptyList();
         }
         
-        PhoneValidator validator = validators.get(providerType);
+        PhoneValidator validator = validators.get(SmsProviderKeys.of(providerType));
         if (validator == null) {
             // 降级到本地校验器
-            validator = validators.get(SmsProviderType.MOCK);
+            validator = validators.get(SmsProviderKeys.of(SmsProviderType.MOCK));
             if (validator == null) {
                 return phoneNumbers.stream()
                         .map(phone -> createErrorResult(phone, "不支持的校验器类型: " + providerType))
@@ -180,7 +182,7 @@ public class PhoneValidationAdapter {
      * @return 是否为有效格式
      */
     public boolean isValidFormat(String phoneNumber) {
-        PhoneValidator localValidator = validators.get(SmsProviderType.MOCK);
+        PhoneValidator localValidator = validators.get(SmsProviderKeys.of(SmsProviderType.MOCK));
         return localValidator != null && localValidator.isValidFormat(phoneNumber);
     }
     
@@ -191,7 +193,12 @@ public class PhoneValidationAdapter {
      * @return 是否支持
      */
     public boolean isSupported(SmsProviderType providerType) {
-        return validators.containsKey(providerType);
+        return isSupported(SmsProviderKeys.of(providerType));
+    }
+
+    public boolean isSupported(String providerCode) {
+        String key = SmsProviderKeys.normalize(providerCode);
+        return key != null && validators.containsKey(key);
     }
     
     /**
@@ -202,10 +209,10 @@ public class PhoneValidationAdapter {
     public List<ValidatorInfo> getSupportedValidators() {
         List<ValidatorInfo> validatorInfos = new ArrayList<>();
         
-        for (Map.Entry<SmsProviderType, PhoneValidator> entry : validators.entrySet()) {
+        for (Map.Entry<String, PhoneValidator> entry : validators.entrySet()) {
             PhoneValidator validator = entry.getValue();
             validatorInfos.add(new ValidatorInfo(
-                    entry.getKey().name(),
+                    entry.getKey(),
                     validator.getSupportedProvider(),
                     validator.getCostInfo(),
                     validator.getLimitInfo(),
@@ -223,8 +230,13 @@ public class PhoneValidationAdapter {
      * @param validator 校验器实例
      */
     public void addValidator(SmsProviderType providerType, PhoneValidator validator) {
-        validators.put(providerType, validator);
+        validators.put(SmsProviderKeys.of(providerType), validator);
         log.info("添加自定义校验器: {}", providerType);
+    }
+
+    public void addValidator(String providerCode, PhoneValidator validator) {
+        validators.put(SmsProviderKeys.normalize(providerCode), validator);
+        log.info("添加自定义校验器: {}", providerCode);
     }
     
     /**
@@ -233,7 +245,7 @@ public class PhoneValidationAdapter {
      * @param providerType 提供商类型
      */
     public void removeValidator(SmsProviderType providerType) {
-        validators.remove(providerType);
+        validators.remove(SmsProviderKeys.of(providerType));
         log.info("移除校验器: {}", providerType);
     }
     

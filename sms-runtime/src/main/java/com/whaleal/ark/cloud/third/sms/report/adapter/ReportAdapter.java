@@ -1,6 +1,7 @@
 package com.whaleal.ark.cloud.third.sms.report.adapter;
 
 import com.whaleal.ark.cloud.third.sms.config.SmsProviderConfig;
+import com.whaleal.ark.cloud.third.sms.enums.SmsProviderKeys;
 import com.whaleal.ark.cloud.third.sms.enums.SmsProviderType;
 import com.whaleal.ark.cloud.third.sms.report.entity.SmsReport;
 import com.whaleal.ark.cloud.third.sms.report.fetcher.MockReportFetcher;
@@ -22,7 +23,7 @@ import java.util.Map;
 @Slf4j
 public class ReportAdapter {
 
-    private final Map<SmsProviderType, ReportFetcher> fetcherMap;
+    private final Map<String, ReportFetcher> fetcherMap;
 
     public ReportAdapter() {
         this.fetcherMap = new HashMap<>();
@@ -33,7 +34,8 @@ public class ReportAdapter {
      * 初始化各提供商的状态查询器
      */
     private void initializeFetchers() {
-        fetcherMap.put(SmsProviderType.MOCK, new MockReportFetcher());
+        MockReportFetcher mock = new MockReportFetcher();
+        fetcherMap.put(SmsProviderKeys.normalize(mock.getSupportedProvider()), mock);
         fetcherMap.putAll(SmsExtensionLoader.loadProviders(ReportFetcher.class, ReportFetcher::getSupportedProvider));
         log.info("状态报告获取器初始化完成，支持 {} 个提供商", fetcherMap.size());
     }
@@ -50,7 +52,7 @@ public class ReportAdapter {
         try {
             log.debug("开始查询状态报告，提供商: {}, 消息ID: {}", providerType, messageId);
 
-            ReportFetcher fetcher = fetcherMap.get(providerType);
+            ReportFetcher fetcher = fetcherMap.get(SmsProviderKeys.of(providerType));
             if (fetcher == null) {
                 log.warn("未找到提供商 {} 的状态查询器", providerType);
                 return createUnsupportedReport(providerType, messageId);
@@ -85,7 +87,7 @@ public class ReportAdapter {
         try {
             log.debug("开始批量查询状态报告，提供商: {}, 消息数量: {}", providerType, messageIds.size());
 
-            ReportFetcher fetcher = fetcherMap.get(providerType);
+            ReportFetcher fetcher = fetcherMap.get(SmsProviderKeys.of(providerType));
             if (fetcher == null) {
                 log.warn("未找到提供商 {} 的状态查询器", providerType);
                 return messageIds.stream()
@@ -124,7 +126,7 @@ public class ReportAdapter {
         try {
             log.debug("开始查询批次状态报告，提供商: {}, 批次ID: {}", providerType, batchId);
 
-            ReportFetcher fetcher = fetcherMap.get(providerType);
+            ReportFetcher fetcher = fetcherMap.get(SmsProviderKeys.of(providerType));
             if (fetcher == null) {
                 log.warn("未找到提供商 {} 的状态查询器", providerType);
                 return List.of(createUnsupportedReport(providerType, batchId));
@@ -193,7 +195,7 @@ public class ReportAdapter {
      * @return 是否支持
      */
     public boolean isSupported(SmsProviderType providerType) {
-        return fetcherMap.containsKey(providerType);
+        return isSupported(SmsProviderKeys.of(providerType));
     }
 
     /**
@@ -201,7 +203,21 @@ public class ReportAdapter {
      *
      * @return 支持的提供商类型数组
      */
+    public java.util.Set<String> getSupportedProviderCodes() {
+        return java.util.Set.copyOf(fetcherMap.keySet());
+    }
+
+    /** @deprecated 请使用 {@link #getSupportedProviderCodes()} */
+    @Deprecated
     public SmsProviderType[] getSupportedProviders() {
-        return fetcherMap.keySet().toArray(new SmsProviderType[0]);
+        return fetcherMap.keySet().stream()
+                .map(SmsProviderType::tryFromCode)
+                .flatMap(java.util.Optional::stream)
+                .toArray(SmsProviderType[]::new);
+    }
+
+    public boolean isSupported(String providerCode) {
+        String key = SmsProviderKeys.normalize(providerCode);
+        return key != null && fetcherMap.containsKey(key);
     }
 }

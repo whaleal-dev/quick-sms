@@ -1,5 +1,6 @@
 package com.whaleal.ark.cloud.third.sms.config;
 
+import com.whaleal.ark.cloud.third.sms.enums.SmsProviderKeys;
 import com.whaleal.ark.cloud.third.sms.enums.SmsProviderType;
 import lombok.Data;
 import lombok.Builder;
@@ -20,9 +21,15 @@ import java.util.Objects;
 public class SmsProviderConfig {
     
     /**
-     * 提供商类型
+     * 提供商类型（核心通道枚举；扩展厂商可只填 {@link #providerCode}）
      */
     private SmsProviderType providerType;
+
+    /**
+     * 提供商编码（扩展厂商用，无需改 {@link SmsProviderType}）。
+     * <p>与 SPI {@code getSupportedProvider()} 返回值一致，建议小写，如 {@code yunpian}。</p>
+     */
+    private String providerCode;
     
     /**
      * 是否启用
@@ -124,6 +131,16 @@ public class SmsProviderConfig {
      */
     @Builder.Default
     private Boolean sslEnabled = true;
+
+    /**
+     * HTTP 代理主机（可选；配合 {@link #proxyPort}）
+     */
+    private String proxyHost;
+
+    /**
+     * HTTP 代理端口（可选）
+     */
+    private Integer proxyPort;
     
     /**
      * 扩展配置参数
@@ -252,6 +269,13 @@ public class SmsProviderConfig {
         return null;
     }
     
+    /**
+     * SPI / 适配器查找键：优先 {@link #providerCode}，否则取枚举 code。
+     */
+    public String resolveProviderKey() {
+        return SmsProviderKeys.resolve(providerType, providerCode);
+    }
+
     private boolean isEmpty(String str) {
         return str == null || str.trim().isEmpty();
     }
@@ -262,6 +286,7 @@ public class SmsProviderConfig {
         if (o == null || getClass() != o.getClass()) return false;
         SmsProviderConfig that = (SmsProviderConfig) o;
         return Objects.equals(providerType, that.providerType) &&
+               Objects.equals(providerCode, that.providerCode) &&
                Objects.equals(apiKey, that.apiKey) &&
                Objects.equals(apiSecret, that.apiSecret) &&
                Objects.equals(accessKeyId, that.accessKeyId) &&
@@ -272,7 +297,7 @@ public class SmsProviderConfig {
     
     @Override
     public int hashCode() {
-        return Objects.hash(providerType, apiKey, apiSecret, accessKeyId, 
+        return Objects.hash(providerType, providerCode, apiKey, apiSecret, accessKeyId, 
                           accessKeySecret, region, baseUrl);
     }
 } 

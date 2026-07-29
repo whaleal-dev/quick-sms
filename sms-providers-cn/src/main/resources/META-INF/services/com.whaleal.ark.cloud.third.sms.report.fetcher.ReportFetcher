@@ -1,0 +1,17 @@
+com.whaleal.ark.cloud.third.sms.provider.aliyun.AliyunReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.baidu.BaiduReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.china_mobile.ChinaMobileReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.china_telecom.ChinaTelecomReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.china_unicom.ChinaUnicomReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.chuanglan.ChuanglanReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.cloopen.CloopenReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.ctyun.CtyunReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.custom_http.CustomHttpReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.huawei.HuaweiReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.luosimao.LuosimaoReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.netease.NeteaseReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.qiniu.QiniuReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.submail.SubmailReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.tencent.TencentReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.yunpian.YunpianReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.zhutong.ZhutongReportFetcher
