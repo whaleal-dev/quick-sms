@@ -2,13 +2,13 @@
 
 > 让发送短信变得更简单——国内与国际统一接入，面向 SaaS 多租户。
 
-本目录是项目文档站，风格参考 [SMS4J 文档](https://sms4j.com/doc2/)，按「前言 → 快速开始 → 进阶 → API → 厂商」组织。
+本目录是项目文档站，按「前言 → 快速开始 → 进阶 → API → 厂商」组织。
 
 ## 目录
 
 | 章节 | 说明 |
 |------|------|
-| [前言](intro.md) | 为什么做、解决什么问题、和 SMS4J / easy-sms 的关系 |
+| [前言](intro.md) | 为什么做、解决什么问题、适用场景 |
 | [Spring Boot 快速开始](quickstart-springboot.md) | 最常用：依赖、Bean、Controller 发信与 Webhook |
 | [JavaSE 快速开始](quickstart-javase.md) | 无 Spring：`SmsClients.builder()` |
 | [进阶能力](features.md) | Failover、黑名单限流、Webhook 安全、指标、代理 |

@@ -1,7 +1,7 @@
 # 厂商接入说明
 
 > 凭证一律通过 `SmsCredentials` / `SmsSendRequest.credentials` 传入，**不要求** `application.yml`。  
-> 风格参考 [SMS4J 支持厂商](https://sms4j.com/doc2/supplier/jieshao.html)：先总览，再按厂商说明关键字段。
+> 先总览，再按厂商说明关键字段。
 
 返回：[文档首页](README.md)
 
@@ -129,7 +129,7 @@ client.sendText("13800138000", "【签名】您的验证码是 1234",
 
 - **凭证：** accessKeyId / accessKeySecret
 - **发送：** 模板；`signName` + `templateCode`
-- **签名：** EOP（对齐 SMS4J `CtyunUtils`）
+- **签名：** EOP
 - **默认 URL：** `https://sms-global.ctapi.ctyun.cn/sms/api/v1`
 
 ### 网易云信 `NETEASE`
@@ -142,7 +142,7 @@ client.sendText("13800138000", "【签名】您的验证码是 1234",
 
 - **凭证：** AK / SK
 - **发送：** 模板；`template` + `signatureId`（用 `signName` 字段承载）+ `contentVar`
-- **签名：** BCE Auth（对齐 SMS4J，`Authorization = prefix//signature`）
+- **签名：** BCE Auth（`Authorization = prefix//signature`）
 
 ### 助通 `ZHUTONG`
 

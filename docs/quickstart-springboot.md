@@ -1,6 +1,6 @@
 # Spring Boot 快速开始
 
-参考 SMS4J「在 SpringBoot 环境集成」的步骤结构，按 Quick SMS 的「无强制 yml」约定编写。
+按 Quick SMS 的「无强制 yml」约定，介绍 Spring Boot 下的依赖、Bean 与发信步骤。
 
 ## 1. 创建项目
 

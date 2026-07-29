@@ -31,7 +31,7 @@ public interface SmsClient {
     SmsProviderType getDefaultProvider();
 
     /**
-     * 快捷发信：正文短信（对标 SMS4J {@code sendMessage(phone, content)}）。
+     * 快捷发信：正文短信。
      */
     default SmsSendResult sendText(String to, String content) {
         return send(SmsSendRequest.builder().to(to).content(content).build());

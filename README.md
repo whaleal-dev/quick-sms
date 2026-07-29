@@ -21,8 +21,6 @@ Quick SMS 的目标是：
 - **SaaS 友好**：**不强制 yml**，凭证在调用时动态传入，适合多租户
 - **网关级能力**：回执 / 上行 / 状态查询 SPI、通道 failover、Webhook 安全、限流黑名单
 
-国内厂商方向同时参考 [SMS4J](https://github.com/dromara/SMS4J) 与 [easy-sms](https://github.com/overtrue/easy-sms)；国际与全链路回调是我们的差异化重点。
-
 📚 **完整文档：** [`docs/`](docs/README.md)
 
 ---
@@ -32,7 +30,7 @@ Quick SMS 的目标是：
 | 能力 | 说明 |
 |------|------|
 | 多厂商聚合 | 国内约 17 家 + 国际约 9 家，SPI 扩展 |
-| 快捷发信 | `sendText` / `sendTemplate`，对标 SMS4J 一行发送 |
+| 快捷发信 | `sendText` / `sendTemplate` 一行发送 |
 | 动态凭证 | 请求级 `SmsCredentials`，秘钥不落盘 |
 | 通道容灾 | 顺序 / 随机 failover |
 | 回执 · 上行 · 查状态 | 统一 Webhook 门面 + 各厂商 Parser/Fetcher |
@@ -129,7 +127,7 @@ public class SmsController {
 }
 ```
 
-> **与 SMS4J 的差异：** SMS4J 主推 `application.yml` blends；Quick SMS **刻意不强制 yml**，凭证在代码 / 请求中传入，更适合多租户与配置中心。
+> **设计约定：** Quick SMS **不强制 yml**，凭证在代码 / 请求中传入，更适合多租户与配置中心。
 
 更多步骤：
 
@@ -168,7 +166,7 @@ quick-sms/
 
 | 文档 | 内容 |
 |------|------|
-| [前言](docs/intro.md) | 设计理念、与 SMS4J / easy-sms 定位 |
+| [前言](docs/intro.md) | 设计理念与适用场景 |
 | [Spring Boot 快速开始](docs/quickstart-springboot.md) | 依赖、Bean、发信、Webhook Controller |
 | [JavaSE 快速开始](docs/quickstart-javase.md) | Builder、无 Spring 用法 |
 | [进阶配置](docs/features.md) | Failover、限流、安全、指标、代理 |

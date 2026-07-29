@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * 百度云短信（对齐 SMS4J BaiduUtils BCE Auth）。
+ * 百度云短信（BCE Auth）。
  *
  * @author 恒哥
  * @since 2026-07-29
@@ -82,7 +82,7 @@ public class BaiduOutboundSender implements OutboundSender {
     }
 
     /**
-     * 对齐 SMS4J：Authorization = authPrefix + "//" + signature；只签 host。
+     * BCE Auth：Authorization = authPrefix + "//" + signature；只签 host。
      */
     static Map<String, String> buildHeaders(String ak, String sk, String host, String path, String clientToken) {
         Instant now = Instant.now();

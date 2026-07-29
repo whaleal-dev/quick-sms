@@ -1,6 +1,6 @@
 # JavaSE / 纯 Java 快速开始
 
-对应 SMS4J「在 JavaSE 环境集成」：不依赖 Spring，用工厂 / Builder 发信。
+不依赖 Spring，用工厂 / Builder 发信。
 
 ## 1. 依赖
 

@@ -13,7 +13,7 @@
     <artifactId>sms-providers-cn</artifactId>
     <packaging>jar</packaging>
     <name>SMS Providers CN</name>
-    <description>国内短信厂商 SPI（按 vendor 子包）；参考 SMS4J / easy-sms</description>
+    <description>国内短信厂商 SPI（按 vendor 子包）</description>
 
     <dependencies>
         <dependency>

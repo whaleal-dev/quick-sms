@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * 天翼云短信（对齐 SMS4J CtyunUtils 签名）。
+ * 天翼云短信（EOP 签名）。
  * <p>凭证：accessKeyId + accessKeySecret；templateCode；signName。</p>
  *
  * @author 恒哥
@@ -80,7 +80,7 @@ public class CtyunOutboundSender implements OutboundSender {
     }
 
     /**
-     * 对齐 SMS4J：kTime/kAk/kDate 链式 HMAC，签名串含 request-id / eop-date / body sha256。
+     * EOP：kTime/kAk/kDate 链式 HMAC，签名串含 request-id / eop-date / body sha256。
      */
     static Map<String, String> signHeader(String body, String key, String secret) {
         ZonedDateTime now = ZonedDateTime.now(GMT8);
