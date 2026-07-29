@@ -67,10 +67,15 @@ public class VonageOutboundSender implements OutboundSender {
      */
     private SmsOutboundMessage sendMessagesApi(SmsOutboundMessage message, SmsProviderConfig config)
             throws Exception {
+        String bearer = firstNonBlank(
+                config.getStringConfig("jwt", null),
+                config.getStringConfig("accessToken", null),
+                config.getAccessToken());
         String apiKey = firstNonBlank(config.getApiKey(), config.getAccessKeyId());
         String apiSecret = firstNonBlank(config.getApiSecret(), config.getAccessKeySecret());
-        if (isBlank(apiKey) || isBlank(apiSecret)) {
-            return failMapped(message, "E002", "Vonage apiKey/apiSecret 不能为空");
+        // JWT-only 账号可不配 apiKey/apiSecret；否则必须 Basic
+        if (isBlank(bearer) && (isBlank(apiKey) || isBlank(apiSecret))) {
+            return failMapped(message, "E002", "Vonage 需要 apiKey+apiSecret，或配置 jwt/accessToken");
         }
         String from = firstNonBlank(message.getFrom(), config.getDefaultFrom());
         if (isBlank(from) || isBlank(message.getTo()) || isBlank(message.getContent())) {
@@ -105,10 +110,6 @@ public class VonageOutboundSender implements OutboundSender {
                 .header("Accept", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(json));
 
-        String bearer = firstNonBlank(
-                config.getStringConfig("jwt", null),
-                config.getStringConfig("accessToken", null),
-                config.getAccessToken());
         if (!isBlank(bearer)) {
             req.header("Authorization", "Bearer " + bearer.trim());
         } else {

@@ -107,6 +107,56 @@ class DefaultSmsClientTest {
     }
 
     @Test
+    void hasAuthCredentials_acceptsAppKeyAndAccessToken() {
+        assertThat(DefaultSmsClient.hasAuthCredentials(SmsProviderConfig.builder()
+                .appKey("huawei-ak")
+                .appSecret("huawei-sk")
+                .build())).isTrue();
+
+        assertThat(DefaultSmsClient.hasAuthCredentials(SmsProviderConfig.builder()
+                .accessToken("jwt-token")
+                .build())).isTrue();
+
+        assertThat(DefaultSmsClient.hasAuthCredentials(SmsProviderConfig.builder()
+                .accessKey("mb-access-key")
+                .build())).isTrue();
+
+        assertThat(DefaultSmsClient.hasAuthCredentials(SmsProviderConfig.builder().build())).isFalse();
+    }
+
+    @Test
+    void send_withAppKeyOnly_onHuawei_passesCredentialValidation() {
+        SmsClient client = SmsClients.builder().provider(SmsProviderType.HUAWEI).build();
+
+        SmsSendResult result = client.send(SmsSendRequest.builder()
+                .to("+8613800138000")
+                .content("hello")
+                .credentials(SmsCredentials.builder()
+                        .appKey("test-app-key")
+                        .appSecret("test-app-secret")
+                        .build())
+                .build());
+
+        assertThat(result.getErrorCode()).isNotEqualTo("E002");
+    }
+
+    @Test
+    void send_withAccessTokenOnly_onVonage_passesCredentialValidation() {
+        SmsClient client = SmsClients.builder().provider(SmsProviderType.VONAGE).build();
+
+        SmsSendResult result = client.send(SmsSendRequest.builder()
+                .to("+8613800138000")
+                .from("Vonage")
+                .content("hello")
+                .credentials(SmsCredentials.builder()
+                        .accessToken("eyJhbGciOi.test")
+                        .build())
+                .build());
+
+        assertThat(result.getErrorCode()).isNotEqualTo("E002");
+    }
+
+    @Test
     void sendText_shortcut_withMock_returnsSuccess() {
         SmsClient client = SmsClients.builder().provider(SmsProviderType.MOCK).build();
 

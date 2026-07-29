@@ -216,10 +216,26 @@ public class DefaultSmsClient implements SmsClient {
     }
 
     private boolean hasAuth(SmsProviderConfig config) {
+        return hasAuthCredentials(config);
+    }
+
+    /**
+     * 是否具备任一可用凭证字段（含华为 appKey、MessageBird accessKey、JWT accessToken 等）。
+     */
+    static boolean hasAuthCredentials(SmsProviderConfig config) {
+        if (config == null) {
+            return false;
+        }
         return TextUtils.hasText(config.getApiKey())
                 || TextUtils.hasText(config.getApiSecret())
                 || TextUtils.hasText(config.getAccessKeyId())
-                || TextUtils.hasText(config.getAccessKeySecret());
+                || TextUtils.hasText(config.getAccessKeySecret())
+                || TextUtils.hasText(config.getAppKey())
+                || TextUtils.hasText(config.getAppSecret())
+                || TextUtils.hasText(config.getAccessKey())
+                || TextUtils.hasText(config.getAccessToken())
+                || TextUtils.hasText(config.getStringConfig("jwt", null))
+                || TextUtils.hasText(config.getStringConfig("accessToken", null));
     }
 
     private SmsOutboundMessage toOutboundMessage(SmsSendRequest request, SmsProviderConfig config) {
@@ -228,7 +244,11 @@ public class DefaultSmsClient implements SmsClient {
                 .content(request.getContent())
                 .from(TextUtils.hasText(request.getFrom()) ? request.getFrom() : config.getDefaultFrom());
 
-        if (TextUtils.hasText(request.getTemplateId()) || request.getTemplateParams() != null) {
+        // 纯文本也要透传 referenceId（厂商 client_ref 等）
+        if (TextUtils.hasText(request.getTemplateId())
+                || request.getTemplateParams() != null
+                || TextUtils.hasText(request.getReferenceId())
+                || TextUtils.hasText(config.getSignName())) {
             builder.businessInfo(SmsOutboundMessage.BusinessInfo.builder()
                     .templateId(request.getTemplateId())
                     .templateParams(request.getTemplateParams())
