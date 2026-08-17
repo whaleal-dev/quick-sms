@@ -91,11 +91,15 @@ Quick SMS 的目标是：
 
 ## 30 秒上手
 
-### Maven（从 GitHub Packages 拉取）
+### Maven 引入依赖
 
-本项目 **不发 Maven Central**，JAR 发布在 [GitHub Packages](https://github.com/whaleal-dev/quick-sms/packages)。
+本项目 **不发 Maven Central**。可用下面两种方式之一。
 
-> **注意：** 即便包是公开的，GitHub Packages 的 Maven 仓库仍要求认证，不能像中央仓库那样匿名下载。消费方需要同时配置 `settings.xml`（PAT）与 `pom.xml`（仓库地址）。
+#### 方式一：从 GitHub Packages 拉取
+
+JAR 在 [GitHub Packages](https://github.com/whaleal-dev/quick-sms/packages)。
+
+> **注意：** 即便包是公开的，GitHub Packages 的 Maven 仓库仍要求认证，不能像中央仓库那样匿名下载。需同时配置 `settings.xml`（PAT）与 `pom.xml`（仓库地址）。
 
 **1. 配置认证**（`~/.m2/settings.xml`）
 
@@ -136,6 +140,32 @@ Quick SMS 的目标是：
 或按需：`sms-spring-boot-starter` + `sms-providers-cn` / `sms-providers-intl`。
 
 > 版本以 Packages / Release 页面为准；推送 `release-x.y.z` 分支后会自动发布对应版本。
+
+#### 方式二：源码 `mvn install`（无需 Packages 认证）
+
+适合本地开发、不想配置 PAT 的场景：把模块安装到本机 `~/.m2/repository`，业务项目直接依赖即可。
+
+```bash
+git clone https://github.com/whaleal-dev/quick-sms.git
+cd quick-sms
+mvn clean install -DskipTests
+```
+
+安装成功后，业务项目 `pom.xml` **不必**再配 GitHub Packages 仓库，直接写依赖：
+
+```xml
+<dependency>
+  <groupId>com.whaleal.third</groupId>
+  <artifactId>sms-all</artifactId>
+  <version>1.0.0</version> <!-- 与根 pom 中 <version> 一致 -->
+</dependency>
+```
+
+说明：
+
+- 需本机已安装 **JDK 21** 与 Maven
+- `install` 会安装全部子模块（`sms-api` / `sms-runtime` / `sms-providers-*` / `sms-all` 等）
+- 若只想打本地包不跑测试，可用上面的 `-DskipTests`；完整校验用 `mvn clean install`
 
 ### 纯 Java（无需 yml）
 
@@ -262,7 +292,7 @@ git checkout -b release-1.0.1 && git push -u origin release-1.0.1
 包地址：`https://maven.pkg.github.com/whaleal-dev/quick-sms`  
 Packages 页：[github.com/whaleal-dev/quick-sms/packages](https://github.com/whaleal-dev/quick-sms/packages)
 
-消费方如何配置仓库与下载 JAR，见上文 **[Maven（从 GitHub Packages 拉取）](#maven从-github-packages-拉取)**。
+消费方如何引入依赖，见上文 **[Maven 引入依赖](#maven-引入依赖)**（Packages 拉取或源码 `mvn install`）。
 
 ---
 

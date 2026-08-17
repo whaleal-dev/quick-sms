@@ -65,6 +65,18 @@ git push -u origin release-1.0.1
 
 `repository.id` 与 `server.id` 必须同为 `github`。
 
-详见仓库 README：[Maven（从 GitHub Packages 拉取）](../README.md#maven从-github-packages-拉取)。
+### 方式二：源码 `mvn install`
+
+不配 PAT 时，可把源码装到本地仓库：
+
+```bash
+git clone https://github.com/whaleal-dev/quick-sms.git
+cd quick-sms
+mvn clean install -DskipTests
+```
+
+业务项目直接依赖 `com.whaleal.third:sms-all:1.0.0`（版本与根 pom 一致），无需再写 GitHub Packages 仓库。
+
+详见仓库 README：[Maven 引入依赖](../README.md#maven-引入依赖)。
 
 返回：[文档首页](README.md)
