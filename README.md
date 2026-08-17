@@ -219,7 +219,7 @@ Java 21 · Spring Boot 3.4.x
 
 | 场景 | 触发 | Workflow | Secrets |
 |------|------|----------|---------|
-| 构建测试 | PR / push `main` | [ci.yml](.github/workflows/ci.yml) | 无 |
+| 构建测试 | PR / push `main`、**`release-*`** | [ci.yml](.github/workflows/ci.yml) | 无 |
 | **发布 Package** | 分支 **`release-*`** | [publish-github-packages.yml](.github/workflows/publish-github-packages.yml) | **无**（用 `GITHUB_TOKEN`） |
 
 ```bash

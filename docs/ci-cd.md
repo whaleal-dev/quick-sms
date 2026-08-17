@@ -15,7 +15,7 @@ Packages 页：https://github.com/whaleal-dev/quick-sms/packages
 
 | Workflow | 监听 | 作用 |
 |----------|------|------|
-| [ci.yml](../.github/workflows/ci.yml) | 分支 `main`（PR / push） | 编译测试 |
+| [ci.yml](../.github/workflows/ci.yml) | 分支 `main`、**`release-*`**（PR / push） | 编译测试 |
 | [publish-github-packages.yml](../.github/workflows/publish-github-packages.yml) | 分支 **`release-*`** | 测试 → 发 Packages → 建 Release |
 
 ## 发布
