@@ -2,20 +2,20 @@
 # https://github.com/whaleal-dev/quick-sms/packages
 #
 # 触发：
-#   - push 标签：v1.0.1（推荐）
+#   - push 分支：release-1.0.1 / release-v1.0.1
 #   - 手动 workflow_dispatch（可填 version）
 #
-# 流程：解析版本 → 测试 → deploy Packages → 创建 GitHub Release
+# 流程：从分支名解析版本 → 测试 → deploy Packages → 创建 GitHub Release
 name: Publish GitHub Packages
 
 on:
   push:
-    tags:
-      - 'v*.*.*'
+    branches:
+      - 'release-*'
   workflow_dispatch:
     inputs:
       version:
-        description: '发布版本，如 1.0.1（留空则用当前 pom；tag 触发时从 tag 解析）'
+        description: '发布版本，如 1.0.1（留空则从 release-* 分支名解析）'
         required: false
         type: string
       skip_tests:
@@ -49,14 +49,18 @@ jobs:
           INPUT_VERSION="${{ github.event.inputs.version }}"
           if [ -n "${INPUT_VERSION}" ]; then
             VERSION="${INPUT_VERSION#v}"
-          elif [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
-            VERSION="${GITHUB_REF_NAME#v}"
           else
-            VERSION="$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version)"
+            # release-1.0.1 / release-v1.0.1 → 1.0.1
+            REF_NAME="${GITHUB_REF_NAME}"
+            VERSION="${REF_NAME#release-}"
             VERSION="${VERSION#v}"
           fi
           if [ -z "${VERSION}" ] || [[ ! "${VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-].+)?$ ]]; then
-            echo "::error::无法解析语义化版本。请打标签 v1.0.1 或手动传入 version。当前: ${VERSION:-empty}"
+            echo "::error::无法解析版本号。请使用分支 release-x.y.z，或手动传入 version。当前: ${VERSION:-empty}"
+            exit 1
+          fi
+          if [[ "${VERSION}" == *-SNAPSHOT ]]; then
+            echo "::error::正式发布不允许 SNAPSHOT: ${VERSION}"
             exit 1
           fi
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"

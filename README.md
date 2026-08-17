@@ -220,10 +220,10 @@ Java 21 · Spring Boot 3.4.x
 | 场景 | 触发 | Workflow | Secrets |
 |------|------|----------|---------|
 | 构建测试 | PR / push `main` | [ci.yml](.github/workflows/ci.yml) | 无 |
-| **发布 Package** | 标签 `v1.0.1` | [publish-github-packages.yml](.github/workflows/publish-github-packages.yml) | **无**（用 `GITHUB_TOKEN`） |
+| **发布 Package** | 分支 **`release-*`** | [publish-github-packages.yml](.github/workflows/publish-github-packages.yml) | **无**（用 `GITHUB_TOKEN`） |
 
 ```bash
-git tag v1.0.1 && git push origin v1.0.1
+git checkout -b release-1.0.1 && git push -u origin release-1.0.1
 ```
 
 包地址：`https://maven.pkg.github.com/whaleal-dev/quick-sms`  
