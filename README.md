@@ -93,7 +93,28 @@ Quick SMS 的目标是：
 
 ### Maven（从 GitHub Packages 拉取）
 
-本项目 **不发 Maven Central**，JAR 发布在 GitHub Packages。在 `pom.xml` 中配置仓库地址并引入依赖即可（**无需** `settings.xml`）：
+本项目 **不发 Maven Central**，JAR 发布在 [GitHub Packages](https://github.com/whaleal-dev/quick-sms/packages)。
+
+> **注意：** 即便包是公开的，GitHub Packages 的 Maven 仓库仍要求认证，不能像中央仓库那样匿名下载。消费方需要同时配置 `settings.xml`（PAT）与 `pom.xml`（仓库地址）。
+
+**1. 配置认证**（`~/.m2/settings.xml`）
+
+创建 [Personal Access Token (classic)](https://github.com/settings/tokens)，勾选 **`read:packages`**。  
+`<server><id>` 必须与下面仓库的 `<id>` 一致（均为 `github`）。
+
+```xml
+<settings>
+  <servers>
+    <server>
+      <id>github</id>
+      <username>YOUR_GITHUB_USERNAME</username>
+      <password>YOUR_GITHUB_PAT</password>
+    </server>
+  </servers>
+</settings>
+```
+
+**2. 配置仓库地址并添加依赖**（项目 `pom.xml`）
 
 ```xml
 <repositories>
@@ -113,8 +134,6 @@ Quick SMS 的目标是：
 ```
 
 或按需：`sms-spring-boot-starter` + `sms-providers-cn` / `sms-providers-intl`。
-
-Packages 页：[github.com/whaleal-dev/quick-sms/packages](https://github.com/whaleal-dev/quick-sms/packages)
 
 > 版本以 Packages / Release 页面为准；推送 `release-x.y.z` 分支后会自动发布对应版本。
 
