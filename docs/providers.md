@@ -37,6 +37,13 @@
 | 网易云信 | `netease` | AppKey / AppSecret | 模板 |
 | 百度云 | `baidu` | AK / SK + signatureId | 模板 |
 | 助通 | `zhutong` | username / password | **内容** |
+| 短信宝 | `smsbao` | user / password | **内容** |
+| 互亿无线 | `huyi` | api_id / api_key | **内容** |
+| 聚合数据 | `juhe` | app_key | 模板 |
+| 云之讯 | `yunzhixun` | sid / token / appId | 模板 |
+| SendCloud | `sendcloud` | smsUser / smsKey | 模板 |
+| 华信 | `huaxin` | account / password + baseUrl | **内容** |
+| 火山引擎 | `volcengine` | AK / SK + signName + smsAccount | 模板 |
 | 移动/电信/联通 | `china_*` | 见各 Sender | 厂商协议 |
 | 自定义 HTTP | `custom_http` | 按配置 | 自定义 |
 
@@ -224,9 +231,54 @@ SmsClient client = SmsClients.builder()
         .addChannel(SmsChannel.of(SmsProviderType.YUNPIAN, credB))
         .rateLimiter(RateLimiter.perMinute(60))
         .build();
+
+// 参考 easy-sms：同一条短信按通道覆盖 content / template
+client.send(SmsSendRequest.builder()
+        .to("13800138000")
+        .content("【签名】默认正文")
+        .contentByProvider(Map.of("yunpian", "【签名】云片专用验证码 1234"))
+        .templateIdByProvider(Map.of("aliyun", "SMS_001"))
+        .templateParamsByProvider(Map.of("aliyun", Map.of("code", "1234")))
+        .build());
 ```
 
 详见 [进阶能力](features.md)。
+
+### 短信宝 `SMSBAO`
+
+- **凭证：** `apiKey`=user，`apiSecret`=password（SDK 内 MD5）
+- **发送：** 内容短信；国际号走 `wsms`
+
+### 互亿无线 `HUYI`
+
+- **凭证：** `apiKey`=api_id，`apiSecret`=api_key
+- **发送：** 内容短信；MD5(account+api_key+mobile+content+time)
+
+### 聚合数据 `JUHE`
+
+- **凭证：** `apiKey`=app_key
+- **发送：** 模板；`templateParams` 键会规范为 `#code#`
+
+### 云之讯 `YUNZHIXUN`
+
+- **凭证：** `apiKey`=sid，`apiSecret`=token，`appId`
+- **发送：** 模板；参数默认逗号拼接（或单键 `params`）
+
+### SendCloud `SENDCLOUD`
+
+- **凭证：** `apiKey`=smsUser，`apiSecret`=smsKey
+- **发送：** 模板；变量键规范为 `%code%`
+
+### 华信 `HUAXIN`
+
+- **凭证：** `apiKey`=account，`apiSecret`=password；`baseUrl` 或 `region`(网关 IP)
+- **发送：** 内容短信
+
+### 火山引擎 `VOLCENGINE`
+
+- **凭证：** `accessKeyId` / `accessKeySecret`
+- **额外：** `signName` + `appId`(smsAccount)；可选 `region`（默认 `cn-north-1`）
+- **发送：** 模板 + Volcengine 签名
 
 ---
 

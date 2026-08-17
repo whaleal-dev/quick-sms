@@ -15,3 +15,10 @@ com.whaleal.ark.cloud.third.sms.provider.submail.SubmailInboundParser
 com.whaleal.ark.cloud.third.sms.provider.tencent.TencentInboundParser
 com.whaleal.ark.cloud.third.sms.provider.yunpian.YunpianInboundParser
 com.whaleal.ark.cloud.third.sms.provider.zhutong.ZhutongInboundParser
+com.whaleal.ark.cloud.third.sms.provider.smsbao.SmsbaoInboundParser
+com.whaleal.ark.cloud.third.sms.provider.huyi.HuyiInboundParser
+com.whaleal.ark.cloud.third.sms.provider.juhe.JuheInboundParser
+com.whaleal.ark.cloud.third.sms.provider.yunzhixun.YunzhixunInboundParser
+com.whaleal.ark.cloud.third.sms.provider.sendcloud.SendcloudInboundParser
+com.whaleal.ark.cloud.third.sms.provider.huaxin.HuaxinInboundParser
+com.whaleal.ark.cloud.third.sms.provider.volcengine.VolcengineInboundParser

@@ -1,0 +1,113 @@
+# 自动发布到本仓库 GitHub Packages
+# https://github.com/whaleal-dev/quick-sms/packages
+#
+# 触发：
+#   - push 标签：v1.0.1（推荐）
+#   - 手动 workflow_dispatch（可填 version）
+#
+# 流程：解析版本 → 测试 → deploy Packages → 创建 GitHub Release
+name: Publish GitHub Packages
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '发布版本，如 1.0.1（留空则用当前 pom；tag 触发时从 tag 解析）'
+        required: false
+        type: string
+      skip_tests:
+        description: '跳过测试（紧急热修时使用）'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: github-packages-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  publish:
+    name: Test & Deploy Packages
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve version
+        id: ver
+        run: |
+          set -euo pipefail
+          INPUT_VERSION="${{ github.event.inputs.version }}"
+          if [ -n "${INPUT_VERSION}" ]; then
+            VERSION="${INPUT_VERSION#v}"
+          elif [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version)"
+            VERSION="${VERSION#v}"
+          fi
+          if [ -z "${VERSION}" ] || [[ ! "${VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-].+)?$ ]]; then
+            echo "::error::无法解析语义化版本。请打标签 v1.0.1 或手动传入 version。当前: ${VERSION:-empty}"
+            exit 1
+          fi
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=v${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Publishing version: ${VERSION}"
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
+
+      - name: Set project version
+        run: |
+          mvn -B -ntp versions:set \
+            -DnewVersion="${{ steps.ver.outputs.version }}" \
+            -DgenerateBackupPoms=false \
+            -DprocessAllModules=true
+
+      - name: Run tests
+        if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.skip_tests != 'true' }}
+        run: mvn -B -ntp clean verify
+
+      - name: Deploy to GitHub Packages
+        run: mvn -B -ntp -DskipTests deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: Quick SMS ${{ steps.ver.outputs.version }}
+          generate_release_notes: true
+          body: |
+            ## Maven（GitHub Packages）
+
+            ```xml
+            <dependency>
+              <groupId>com.whaleal.third</groupId>
+              <artifactId>sms-all</artifactId>
+              <version>${{ steps.ver.outputs.version }}</version>
+            </dependency>
+            ```
+
+            仓库：`https://maven.pkg.github.com/whaleal-dev/quick-sms`
+
+            Packages：https://github.com/whaleal-dev/quick-sms/packages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

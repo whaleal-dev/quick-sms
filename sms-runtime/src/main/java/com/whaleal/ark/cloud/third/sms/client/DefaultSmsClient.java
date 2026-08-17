@@ -2,6 +2,7 @@ package com.whaleal.ark.cloud.third.sms.client;
 
 import com.whaleal.ark.cloud.third.sms.config.SmsProviderConfig;
 import com.whaleal.ark.cloud.third.sms.core.SmsModuleManager;
+import com.whaleal.ark.cloud.third.sms.enums.SmsProviderKeys;
 import com.whaleal.ark.cloud.third.sms.enums.SmsProviderType;
 import com.whaleal.ark.cloud.third.sms.error.ProviderErrorMapper;
 import com.whaleal.ark.cloud.third.sms.error.SmsErrorCodes;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -99,7 +101,9 @@ public class DefaultSmsClient implements SmsClient {
 
             SmsOutboundMessage message = toOutboundMessage(request, effectiveConfig);
             SmsOutboundMessage result;
-            if (TextUtils.hasText(request.getTemplateId())) {
+            boolean useTemplate = message.getBusinessInfo() != null
+                    && TextUtils.hasText(message.getBusinessInfo().getTemplateId());
+            if (useTemplate) {
                 if (provider != null) {
                     result = moduleManager.sendTemplateMessage(provider, message, effectiveConfig);
                 } else {
@@ -201,7 +205,9 @@ public class DefaultSmsClient implements SmsClient {
         if (!TextUtils.hasText(request.getTo())) {
             return ValidationError.of("E001", "接收方手机号不能为空");
         }
-        if (!TextUtils.hasText(request.getContent()) && !TextUtils.hasText(request.getTemplateId())) {
+        if (!TextUtils.hasText(request.getContent())
+                && !TextUtils.hasText(request.getTemplateId())
+                && !hasAnyProviderOverride(request)) {
             return ValidationError.of("E001", "短信内容与模板ID不能同时为空");
         }
 
@@ -239,19 +245,25 @@ public class DefaultSmsClient implements SmsClient {
     }
 
     private SmsOutboundMessage toOutboundMessage(SmsSendRequest request, SmsProviderConfig config) {
+        String providerKey = config != null ? config.resolveProviderKey() : null;
+        String content = resolveByProvider(request.getContentByProvider(), providerKey, request.getContent());
+        String templateId = resolveByProvider(request.getTemplateIdByProvider(), providerKey, request.getTemplateId());
+        Map<String, String> templateParams = resolveParamsByProvider(
+                request.getTemplateParamsByProvider(), providerKey, request.getTemplateParams());
+
         SmsOutboundMessage.SmsOutboundMessageBuilder builder = SmsOutboundMessage.builder()
                 .to(request.getTo())
-                .content(request.getContent())
+                .content(content)
                 .from(TextUtils.hasText(request.getFrom()) ? request.getFrom() : config.getDefaultFrom());
 
         // 纯文本也要透传 referenceId（厂商 client_ref 等）
-        if (TextUtils.hasText(request.getTemplateId())
-                || request.getTemplateParams() != null
+        if (TextUtils.hasText(templateId)
+                || templateParams != null
                 || TextUtils.hasText(request.getReferenceId())
                 || TextUtils.hasText(config.getSignName())) {
             builder.businessInfo(SmsOutboundMessage.BusinessInfo.builder()
-                    .templateId(request.getTemplateId())
-                    .templateParams(request.getTemplateParams())
+                    .templateId(templateId)
+                    .templateParams(templateParams)
                     .signature(config.getSignName())
                     .relatedBusinessId(request.getReferenceId())
                     .build());
@@ -265,6 +277,59 @@ public class DefaultSmsClient implements SmsClient {
         }
 
         return builder.build();
+    }
+
+    /**
+     * 按通道覆盖字段（参考 easy-sms 按 gateway 返回 content/template）。
+     */
+    static String resolveByProvider(Map<String, String> byProvider, String providerKey, String fallback) {
+        if (byProvider != null && providerKey != null) {
+            String normalized = SmsProviderKeys.normalize(providerKey);
+            if (normalized != null) {
+                String v = byProvider.get(normalized);
+                if (!TextUtils.hasText(v)) {
+                    v = byProvider.get(providerKey);
+                }
+                if (TextUtils.hasText(v)) {
+                    return v;
+                }
+            }
+        }
+        return fallback;
+    }
+
+    static Map<String, String> resolveParamsByProvider(Map<String, Map<String, String>> byProvider,
+                                                       String providerKey,
+                                                       Map<String, String> fallback) {
+        if (byProvider != null && providerKey != null) {
+            String normalized = SmsProviderKeys.normalize(providerKey);
+            Map<String, String> v = normalized != null ? byProvider.get(normalized) : null;
+            if (v == null) {
+                v = byProvider.get(providerKey);
+            }
+            if (v != null) {
+                return v;
+            }
+        }
+        return fallback;
+    }
+
+    private static boolean hasAnyProviderOverride(SmsSendRequest request) {
+        if (request.getContentByProvider() != null) {
+            for (String v : request.getContentByProvider().values()) {
+                if (TextUtils.hasText(v)) {
+                    return true;
+                }
+            }
+        }
+        if (request.getTemplateIdByProvider() != null) {
+            for (String v : request.getTemplateIdByProvider().values()) {
+                if (TextUtils.hasText(v)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

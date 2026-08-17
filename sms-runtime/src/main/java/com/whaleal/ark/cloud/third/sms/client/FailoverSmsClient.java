@@ -75,12 +75,24 @@ public class FailoverSmsClient implements SmsClient {
 
         List<String> errors = new ArrayList<>();
         for (SmsChannel channel : ordered) {
+            String channelKey = channel.getProviderCode() != null
+                    ? channel.getProviderCode()
+                    : (channel.getProvider() != null ? channel.getProvider().getCode() : null);
+            String content = DefaultSmsClient.resolveByProvider(
+                    request.getContentByProvider(), channelKey, request.getContent());
+            String templateId = DefaultSmsClient.resolveByProvider(
+                    request.getTemplateIdByProvider(), channelKey, request.getTemplateId());
+            var templateParams = DefaultSmsClient.resolveParamsByProvider(
+                    request.getTemplateParamsByProvider(), channelKey, request.getTemplateParams());
             SmsSendRequest attempt = SmsSendRequest.builder()
                     .to(request.getTo())
-                    .content(request.getContent())
+                    .content(content)
                     .from(request.getFrom())
-                    .templateId(request.getTemplateId())
-                    .templateParams(request.getTemplateParams())
+                    .templateId(templateId)
+                    .templateParams(templateParams)
+                    .contentByProvider(request.getContentByProvider())
+                    .templateIdByProvider(request.getTemplateIdByProvider())
+                    .templateParamsByProvider(request.getTemplateParamsByProvider())
                     .referenceId(request.getReferenceId())
                     .callbackUrl(request.getCallbackUrl())
                     .provider(channel.getProvider())

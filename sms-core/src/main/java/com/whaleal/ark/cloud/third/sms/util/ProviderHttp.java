@@ -26,6 +26,74 @@ public final class ProviderHttp {
     private ProviderHttp() {
     }
 
+    /**
+     * HTTP GET（query 拼到 URL），用于短信宝 / 聚合等。
+     */
+    public static String get(String url, Map<String, String> query, Map<String, String> headers, int timeoutMs)
+            throws Exception {
+        return get(url, query, headers, timeoutMs, null, null);
+    }
+
+    public static String get(String url, Map<String, String> query, Map<String, String> headers,
+                             int timeoutMs, SmsProviderConfig config) throws Exception {
+        if (config == null) {
+            return get(url, query, headers, timeoutMs);
+        }
+        return get(url, query, headers, resolveTimeout(config, timeoutMs),
+                config.getProxyHost(), config.getProxyPort());
+    }
+
+    public static String get(String url, Map<String, String> query, Map<String, String> headers,
+                             int timeoutMs, String proxyHost, Integer proxyPort) throws Exception {
+        String full = appendQuery(url, query);
+        HttpURLConnection conn;
+        if (proxyHost != null && !proxyHost.isBlank() && proxyPort != null && proxyPort > 0) {
+            Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost.trim(), proxyPort));
+            conn = (HttpURLConnection) URI.create(full).toURL().openConnection(proxy);
+        } else {
+            conn = (HttpURLConnection) URI.create(full).toURL().openConnection();
+        }
+        conn.setRequestMethod("GET");
+        conn.setDoOutput(false);
+        conn.setConnectTimeout(timeoutMs);
+        conn.setReadTimeout(timeoutMs);
+        conn.setRequestProperty("Accept", "application/json, text/plain, */*");
+        if (headers != null) {
+            for (Map.Entry<String, String> e : headers.entrySet()) {
+                if (e.getKey() != null && e.getValue() != null) {
+                    conn.setRequestProperty(e.getKey(), e.getValue());
+                }
+            }
+        }
+        int code = conn.getResponseCode();
+        InputStream stream = code >= 400 ? conn.getErrorStream() : conn.getInputStream();
+        if (stream == null) {
+            return "";
+        }
+        try (InputStream in = stream) {
+            ByteArrayOutputStream buf = new ByteArrayOutputStream();
+            byte[] tmp = new byte[4096];
+            int n;
+            while ((n = in.read(tmp)) >= 0) {
+                buf.write(tmp, 0, n);
+            }
+            return buf.toString(StandardCharsets.UTF_8);
+        } finally {
+            conn.disconnect();
+        }
+    }
+
+    public static String appendQuery(String url, Map<String, String> query) {
+        if (query == null || query.isEmpty()) {
+            return url;
+        }
+        String encoded = encodeForm(query);
+        if (encoded.isEmpty()) {
+            return url;
+        }
+        return url + (url.contains("?") ? "&" : "?") + encoded;
+    }
+
     public static String postForm(String url, Map<String, String> form, Map<String, String> headers, int timeoutMs)
             throws Exception {
         return postForm(url, form, headers, timeoutMs, null, null);

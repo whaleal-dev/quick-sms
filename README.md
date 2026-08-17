@@ -29,8 +29,9 @@ Quick SMS 的目标是：
 
 | 能力 | 说明 |
 |------|------|
-| 多厂商聚合 | 国内约 17 家 + 国际约 9 家，SPI 扩展 |
+| 多厂商聚合 | 国内约 24 家 + 国际约 9 家，SPI 扩展 |
 | 快捷发信 | `sendText` / `sendTemplate` 一行发送 |
+| 按通道内容 | `contentByProvider` / `templateIdByProvider`（参考 easy-sms） |
 | 动态凭证 | 请求级 `SmsCredentials`，秘钥不落盘 |
 | 通道容灾 | 顺序 / 随机 failover |
 | 回执 · 上行 · 查状态 | 统一 Webhook 门面 + 各厂商 Parser/Fetcher |
@@ -59,6 +60,13 @@ Quick SMS 的目标是：
 | 网易云信 | `NETEASE` / `netease` |
 | 百度云 | `BAIDU` / `baidu` |
 | 助通 | `ZHUTONG` / `zhutong` |
+| 短信宝 | `SMSBAO` / `smsbao` |
+| 互亿无线 | `HUYI` / `huyi` |
+| 聚合数据 | `JUHE` / `juhe` |
+| 云之讯 | `YUNZHIXUN` / `yunzhixun` |
+| SendCloud | `SENDCLOUD` / `sendcloud` |
+| 华信 | `HUAXIN` / `huaxin` |
+| 火山引擎 | `VOLCENGINE` / `volcengine` |
 | 中国移动 / 电信 / 联通 | `CHINA_*` |
 | 自定义 HTTP | `CUSTOM_HTTP` |
 | Mock（本地） | `MOCK` |
@@ -172,6 +180,7 @@ quick-sms/
 | [进阶配置](docs/features.md) | Failover、限流、安全、指标、代理 |
 | [API 详解](docs/api.md) | 核心类型与错误码 |
 | [厂商接入](docs/providers.md) | 各厂商凭证与回调 |
+| [CI / CD](docs/ci-cd.md) | 自动构建与发布到 GitHub Packages |
 | [示例](examples/README.md) | 可复制代码 |
 | [变更记录](CHANGELOG.md) | 版本说明 |
 
@@ -201,11 +210,24 @@ Java 21 · Spring Boot 3.4.x
 
 ---
 
-## 发布到 Maven Central
+## 仓库与发布
 
-推送分支 **`release-x.y.z`**（如 `release-1.0.1`）会触发 GitHub Actions，自动 `mvn -Pcentral deploy` 发布到 [Maven Central](https://central.sonatype.com)。
+**源码仓库：** [github.com/whaleal-dev/quick-sms](https://github.com/whaleal-dev/quick-sms)  
+**包仓库：** GitHub Packages（**不是** Maven Central）
 
-仓库需配置 Secrets：`MAVEN_CENTRAL_USERNAME`、`MAVEN_CENTRAL_PASSWORD`、`MAVEN_GPG_PRIVATE_KEY`、`MAVEN_GPG_PASSPHRASE`。详见 [`.github/workflows/publish-maven-central.yml`](.github/workflows/publish-maven-central.yml)。
+完整流程见 **[CI / CD 说明](docs/ci-cd.md)**。
+
+| 场景 | 触发 | Workflow | Secrets |
+|------|------|----------|---------|
+| 构建测试 | PR / push `main` | [ci.yml](.github/workflows/ci.yml) | 无 |
+| **发布 Package** | 标签 `v1.0.1` | [publish-github-packages.yml](.github/workflows/publish-github-packages.yml) | **无**（用 `GITHUB_TOKEN`） |
+
+```bash
+git tag v1.0.1 && git push origin v1.0.1
+```
+
+包地址：`https://maven.pkg.github.com/whaleal-dev/quick-sms`  
+Packages 页：[github.com/whaleal-dev/quick-sms/packages](https://github.com/whaleal-dev/quick-sms/packages)
 
 ---
 

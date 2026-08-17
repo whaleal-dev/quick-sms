@@ -21,6 +21,24 @@ client.sendText("13800138000", "【签名】验证码 1234");
 
 若请求里已指定 `provider` / `providerCode`，则**不走** failover 列表。
 
+### 按通道覆盖正文 / 模板（参考 easy-sms）
+
+多厂商 failover 时，各通道对「内容 vs 模板」要求不同。可用 Map 按 provider code 覆盖：
+
+```java
+client.send(SmsSendRequest.builder()
+        .to("13800138000")
+        .content("【签名】默认正文")
+        .contentByProvider(Map.of(
+                "yunpian", "【签名】云片验证码 1234",
+                "smsbao", "【签名】短信宝验证码 1234"))
+        .templateIdByProvider(Map.of("aliyun", "SMS_001"))
+        .templateParamsByProvider(Map.of("aliyun", Map.of("code", "1234")))
+        .build());
+```
+
+优先级：当前通道在 Map 中的值 → 全局 `content` / `templateId` / `templateParams`。
+
 ## 2. 黑名单与限流
 
 ```java

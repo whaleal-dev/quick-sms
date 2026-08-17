@@ -128,7 +128,28 @@ public enum SmsProviderType {
     BAIDU("baidu", "百度云", "中国优先"),
 
     /** 助通短信 */
-    ZHUTONG("zhutong", "助通", "中国优先");
+    ZHUTONG("zhutong", "助通", "中国优先"),
+
+    /** 短信宝 */
+    SMSBAO("smsbao", "短信宝", "中国优先"),
+
+    /** 互亿无线 */
+    HUYI("huyi", "互亿无线", "中国优先"),
+
+    /** 聚合数据 */
+    JUHE("juhe", "聚合数据", "中国优先"),
+
+    /** 云之讯（UCPAAS） */
+    YUNZHIXUN("yunzhixun", "云之讯", "中国优先"),
+
+    /** SendCloud 短信 */
+    SENDCLOUD("sendcloud", "SendCloud", "中国优先"),
+
+    /** 华信短信 */
+    HUAXIN("huaxin", "华信", "中国优先"),
+
+    /** 火山引擎短信 */
+    VOLCENGINE("volcengine", "火山引擎", "中国优先");
 
     private final String code;
     private final String displayName;
@@ -219,6 +240,8 @@ public enum SmsProviderType {
                this == YUNPIAN || this == CHUANGLAN || this == CLOOPEN ||
                this == QINIU || this == LUOSIMAO || this == SUBMAIL ||
                this == CTYUN || this == NETEASE || this == BAIDU || this == ZHUTONG ||
+               this == SMSBAO || this == HUYI || this == JUHE || this == YUNZHIXUN ||
+               this == SENDCLOUD || this == HUAXIN || this == VOLCENGINE ||
                this == CUSTOM_HTTP;
     }
 }

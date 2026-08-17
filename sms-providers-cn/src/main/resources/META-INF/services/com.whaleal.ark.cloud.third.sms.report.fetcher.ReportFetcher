@@ -15,3 +15,10 @@ com.whaleal.ark.cloud.third.sms.provider.submail.SubmailReportFetcher
 com.whaleal.ark.cloud.third.sms.provider.tencent.TencentReportFetcher
 com.whaleal.ark.cloud.third.sms.provider.yunpian.YunpianReportFetcher
 com.whaleal.ark.cloud.third.sms.provider.zhutong.ZhutongReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.smsbao.SmsbaoReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.huyi.HuyiReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.juhe.JuheReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.yunzhixun.YunzhixunReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.sendcloud.SendcloudReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.huaxin.HuaxinReportFetcher
+com.whaleal.ark.cloud.third.sms.provider.volcengine.VolcengineReportFetcher

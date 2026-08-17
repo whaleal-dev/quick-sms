@@ -14,6 +14,7 @@
 | [进阶能力](features.md) | Failover、黑名单限流、Webhook 安全、指标、代理 |
 | [API 详解](api.md) | `SmsClient` / `SmsSendRequest` / 错误码等 |
 | [厂商接入说明](providers.md) | 每家凭证、模板/内容、回调字段 |
+| [CI / CD](ci-cd.md) | 自动构建与发布到 **GitHub Packages** |
 
 返回仓库首页：[README](../README.md) · 示例：[examples](../examples/README.md) · 变更：[CHANGELOG](../CHANGELOG.md)
 

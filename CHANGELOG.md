@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.0.1 — 2026-08-17
+
+### Added
+- 吸收 [easy-sms](https://github.com/overtrue/easy-sms) 能力：
+  - 按通道覆盖正文/模板：`SmsSendRequest.contentByProvider` / `templateIdByProvider` / `templateParamsByProvider`（failover 友好）
+  - 新增国内厂商：短信宝、互亿无线、聚合数据、云之讯、SendCloud、华信、火山引擎
+- `ProviderHttp.get`：支持短信宝 / 聚合等 GET 接口
+- GitHub Packages 发布：默认 `distributionManagement` 指向本仓库；新增 `publish-github-packages.yml`
+- CI/CD：`ci.yml`（PR/main 构建测试）；打 `v*` 标签自动发布到 **GitHub Packages**（非 Maven Central）并创建 Release
+
+### Changed
+- README / `docs/providers.md` 厂商表同步
+- 项目 URL / Packages 目标统一为 [whaleal-dev/quick-sms](https://github.com/whaleal-dev/quick-sms)
+- 新增 [docs/ci-cd.md](docs/ci-cd.md)；移除 Maven Central 自动发布 workflow（按需可再加）
+
 ## 1.0.0 — 2026-07-29
 
 ### Added

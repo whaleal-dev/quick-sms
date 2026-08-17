@@ -18,7 +18,7 @@
 
     <name>Quick SMS</name>
     <description>多供应商短信服务 SDK - 国内/国际分模块，Spring Boot 开箱即用</description>
-    <url>https://whaleal.com</url>
+    <url>https://github.com/whaleal-dev/quick-sms</url>
 
     <organization>
         <name>whaleal-dev</name>
@@ -174,23 +174,24 @@
         </plugins>
     </build>
 
-    <!-- 默认仍可发到 GitHub Packages；Maven Central 走 -Pcentral -->
+    <!-- 默认发布到本仓库 GitHub Packages（https://github.com/whaleal-dev/quick-sms/packages） -->
     <distributionManagement>
         <repository>
-            <id>github-whaleal-dev</id>
-            <url>https://maven.pkg.github.com/whaleal-dev/ark-nexus</url>
+            <id>github</id>
+            <name>GitHub Packages (whaleal-dev/quick-sms)</name>
+            <url>https://maven.pkg.github.com/whaleal-dev/quick-sms</url>
         </repository>
         <snapshotRepository>
-            <id>github-whaleal-dev</id>
-            <url>https://maven.pkg.github.com/whaleal-dev/ark-nexus</url>
+            <id>github</id>
+            <name>GitHub Packages Snapshots (whaleal-dev/quick-sms)</name>
+            <url>https://maven.pkg.github.com/whaleal-dev/quick-sms</url>
         </snapshotRepository>
     </distributionManagement>
 
     <profiles>
         <!--
-          Maven Central（Sonatype Central Portal）发布。
-          CI：push release-* → mvn -Pcentral deploy
-          本地：mvn -Pcentral clean deploy
+          可选：本地手动发 Maven Central（无 CI）。
+          mvn -Pcentral clean deploy
         -->
         <profile>
             <id>central</id>

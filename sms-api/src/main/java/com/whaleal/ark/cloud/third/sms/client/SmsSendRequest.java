@@ -10,6 +10,12 @@ import java.util.Map;
 
 /**
  * 短信发送请求（对外统一入参）
+ * <p>
+ * 参考 easy-sms：同一条短信可按通道覆盖正文 / 模板（failover 时各厂商写法不同）。
+ * </p>
+ *
+ * @author whaleal-dev
+ * @author 恒哥
  */
 @Data
 @Builder
@@ -31,6 +37,22 @@ public class SmsSendRequest {
 
     /** 模板参数 */
     private Map<String, String> templateParams;
+
+    /**
+     * 按通道覆盖正文（key 为 provider code，如 {@code yunpian} / {@code smsbao}）。
+     * <p>failover 时优先取当前通道对应值，缺省回退 {@link #content}。</p>
+     */
+    private Map<String, String> contentByProvider;
+
+    /**
+     * 按通道覆盖模板 ID。
+     */
+    private Map<String, String> templateIdByProvider;
+
+    /**
+     * 按通道覆盖模板参数。
+     */
+    private Map<String, Map<String, String>> templateParamsByProvider;
 
     /** 业务引用 ID（可选） */
     private String referenceId;
