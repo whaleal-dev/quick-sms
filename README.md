@@ -91,18 +91,32 @@ Quick SMS 的目标是：
 
 ## 30 秒上手
 
-### Maven
+### Maven（从 GitHub Packages 拉取）
+
+本项目 **不发 Maven Central**，JAR 发布在 GitHub Packages。在 `pom.xml` 中配置仓库地址并引入依赖即可（**无需** `settings.xml`）：
 
 ```xml
+<repositories>
+  <repository>
+    <id>github</id>
+    <name>GitHub Packages (quick-sms)</name>
+    <url>https://maven.pkg.github.com/whaleal-dev/quick-sms</url>
+  </repository>
+</repositories>
+
 <!-- 推荐：国内 + 国际全量 -->
 <dependency>
-    <groupId>com.whaleal.third</groupId>
-    <artifactId>sms-all</artifactId>
-    <version>1.0.0</version>
+  <groupId>com.whaleal.third</groupId>
+  <artifactId>sms-all</artifactId>
+  <version>1.0.0</version>
 </dependency>
 ```
 
 或按需：`sms-spring-boot-starter` + `sms-providers-cn` / `sms-providers-intl`。
+
+Packages 页：[github.com/whaleal-dev/quick-sms/packages](https://github.com/whaleal-dev/quick-sms/packages)
+
+> 版本以 Packages / Release 页面为准；推送 `release-x.y.z` 分支后会自动发布对应版本。
 
 ### 纯 Java（无需 yml）
 
@@ -228,6 +242,8 @@ git checkout -b release-1.0.1 && git push -u origin release-1.0.1
 
 包地址：`https://maven.pkg.github.com/whaleal-dev/quick-sms`  
 Packages 页：[github.com/whaleal-dev/quick-sms/packages](https://github.com/whaleal-dev/quick-sms/packages)
+
+消费方如何配置仓库与下载 JAR，见上文 **[Maven（从 GitHub Packages 拉取）](#maven从-github-packages-拉取)**。
 
 ---
 
