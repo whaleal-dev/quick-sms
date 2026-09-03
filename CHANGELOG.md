@@ -2,6 +2,9 @@
 
 ## 1.0.1 — 2026-08-17
 
+### Changed
+- Maven `groupId`：`com.whaleal.third` → `io.github.whaleal-dev`（Java 包名不变）
+
 ### Added
 - 吸收 [easy-sms](https://github.com/overtrue/easy-sms) 能力：
   - 按通道覆盖正文/模板：`SmsSendRequest.contentByProvider` / `templateIdByProvider` / `templateParamsByProvider`（failover 友好）

@@ -14,7 +14,7 @@
 | [进阶能力](features.md) | Failover、黑名单限流、Webhook 安全、指标、代理 |
 | [API 详解](api.md) | `SmsClient` / `SmsSendRequest` / 错误码等 |
 | [厂商接入说明](providers.md) | 每家凭证、模板/内容、回调字段 |
-| [CI / CD](ci-cd.md) | 自动构建与发布到 **GitHub Packages** |
+| [CI / CD](ci-cd.md) | GitHub Packages / **Maven Central** 发布 |
 
 返回仓库首页：[README](../README.md) · 示例：[examples](../examples/README.md) · 变更：[CHANGELOG](../CHANGELOG.md)
 
@@ -27,7 +27,7 @@ SmsClient client = SmsClients.builder()
 client.sendText("13800138000", "【QuickSMS】验证码 1234");
 ```
 
-Maven 坐标：`com.whaleal.third:sms-all:1.0.0`（或 starter + providers 按需组合）。
+Maven 坐标：`io.github.whaleal-dev:sms-all:1.0.0`（或 starter + providers 按需组合）。
 
 ## 设计要点（务必读）
 

@@ -6,12 +6,12 @@
 
 ```xml
 <dependency>
-    <groupId>com.whaleal.third</groupId>
+    <groupId>io.github.whaleal-dev</groupId>
     <artifactId>sms-runtime</artifactId>
     <version>1.0.0</version>
 </dependency>
 <dependency>
-    <groupId>com.whaleal.third</groupId>
+    <groupId>io.github.whaleal-dev</groupId>
     <artifactId>sms-providers-cn</artifactId>
     <version>1.0.0</version>
 </dependency>
@@ -22,7 +22,7 @@
 
 ```xml
 <dependency>
-    <groupId>com.whaleal.third</groupId>
+    <groupId>io.github.whaleal-dev</groupId>
     <artifactId>sms-all</artifactId>
     <version>1.0.0</version>
 </dependency>

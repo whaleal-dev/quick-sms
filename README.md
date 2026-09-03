@@ -93,7 +93,20 @@ Quick SMS 的目标是：
 
 ### Maven 引入依赖
 
-本项目 **不发 Maven Central**。可用下面两种方式之一。
+坐标：`io.github.whaleal-dev:sms-all:<version>`（Java 包名仍为 `com.whaleal...`，不变）。
+
+发到 **Maven Central** 后，推荐只写依赖（无需仓库、无需 `settings.xml`）：
+
+```xml
+<dependency>
+  <groupId>io.github.whaleal-dev</groupId>
+  <artifactId>sms-all</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
+发布到中央仓的步骤见 **[CI / CD：Maven Central](docs/ci-cd.md#发布到-maven-central推荐对外)**。  
+在尚未出现在 Central 之前，可用下面两种方式。
 
 #### 方式一：从 GitHub Packages 拉取
 
@@ -131,7 +144,7 @@ JAR 在 [GitHub Packages](https://github.com/whaleal-dev/quick-sms/packages)。
 
 <!-- 推荐：国内 + 国际全量 -->
 <dependency>
-  <groupId>com.whaleal.third</groupId>
+  <groupId>io.github.whaleal-dev</groupId>
   <artifactId>sms-all</artifactId>
   <version>1.0.0</version>
 </dependency>
@@ -139,7 +152,7 @@ JAR 在 [GitHub Packages](https://github.com/whaleal-dev/quick-sms/packages)。
 
 或按需：`sms-spring-boot-starter` + `sms-providers-cn` / `sms-providers-intl`。
 
-> 版本以 Packages / Release 页面为准；推送 `release-x.y.z` 分支后会自动发布对应版本。
+> 版本以 Packages / Release / Central 页面为准。
 
 #### 方式二：源码 `mvn install`（无需 Packages 认证）
 
@@ -155,7 +168,7 @@ mvn clean install -DskipTests
 
 ```xml
 <dependency>
-  <groupId>com.whaleal.third</groupId>
+  <groupId>io.github.whaleal-dev</groupId>
   <artifactId>sms-all</artifactId>
   <version>1.0.0</version> <!-- 与根 pom 中 <version> 一致 -->
 </dependency>
@@ -275,24 +288,31 @@ Java 21 · Spring Boot 3.4.x
 
 ## 仓库与发布
 
-**源码仓库：** [github.com/whaleal-dev/quick-sms](https://github.com/whaleal-dev/quick-sms)  
-**包仓库：** GitHub Packages（**不是** Maven Central）
+**源码仓库：** [github.com/whaleal-dev/quick-sms](https://github.com/whaleal-dev/quick-sms)
 
 完整流程见 **[CI / CD 说明](docs/ci-cd.md)**。
 
 | 场景 | 触发 | Workflow | Secrets |
 |------|------|----------|---------|
-| 构建测试 | PR / push `main`、**`release-*`** | [ci.yml](.github/workflows/ci.yml) | 无 |
-| **发布 Package** | 分支 **`release-*`** | [publish-github-packages.yml](.github/workflows/publish-github-packages.yml) | **无**（用 `GITHUB_TOKEN`） |
+| 构建测试 | PR / push `main`、`release-*` | [ci.yml](.github/workflows/ci.yml) | 无 |
+| GitHub Packages | 分支 **`release-*`** | [publish-github-packages.yml](.github/workflows/publish-github-packages.yml) | 无 |
+| **Maven Central** | 分支 **`central-*`** | [publish-maven-central.yml](.github/workflows/publish-maven-central.yml) | 见下 |
+
+**发中央仓（推荐对外）：**
 
 ```bash
-git checkout -b release-1.0.1 && git push -u origin release-1.0.1
+git checkout -b central-1.0.0 && git push -u origin central-1.0.0
 ```
 
-包地址：`https://maven.pkg.github.com/whaleal-dev/quick-sms`  
-Packages 页：[github.com/whaleal-dev/quick-sms/packages](https://github.com/whaleal-dev/quick-sms/packages)
+需在仓库配置 Secrets：`MAVEN_CENTRAL_USERNAME`、`MAVEN_CENTRAL_PASSWORD`、`MAVEN_GPG_PRIVATE_KEY`、`MAVEN_GPG_PASSPHRASE`。命名空间须为 **`io.github.whaleal-dev`**。
 
-消费方如何引入依赖，见上文 **[Maven 引入依赖](#maven-引入依赖)**（Packages 拉取或源码 `mvn install`）。
+**发 GitHub Packages：**
+
+```bash
+git checkout -b release-1.0.0 && git push -u origin release-1.0.0
+```
+
+消费方引入方式见 **[Maven 引入依赖](#maven-引入依赖)**。
 
 ---
 

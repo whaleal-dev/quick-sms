@@ -18,3 +18,8 @@ Thumbs.db
 
 # Logs
 *.log
+
+# GPG / secrets (never commit)
+*.asc
+*private-key*
+*passphrase*

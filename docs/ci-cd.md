@@ -2,81 +2,151 @@
 
 仓库：[whaleal-dev/quick-sms](https://github.com/whaleal-dev/quick-sms)
 
-**只发布到 GitHub Packages**（不用 Maven Central）。
-
-包地址：`https://maven.pkg.github.com/whaleal-dev/quick-sms`  
-Packages 页：https://github.com/whaleal-dev/quick-sms/packages
-
-## 需要配置什么？
-
-| 角色 | 配置 |
+| 目标 | 地址 |
 |------|------|
-| **发布（Actions）** | **无需** Secrets（用 `GITHUB_TOKEN`） |
-| **消费（下载 JAR）** | **需要** `settings.xml` 认证 + `pom.xml` 仓库地址（见下） |
-
-> GitHub Packages 即使公开包，Maven 拉取也**不能匿名**，必须用 PAT（`read:packages`）。
+| GitHub Packages | `https://maven.pkg.github.com/whaleal-dev/quick-sms` |
+| Maven Central | 坐标 `io.github.whaleal-dev:*`（发成功后可在 [Central Search](https://central.sonatype.com) 查） |
 
 ## 工作流
 
 | Workflow | 监听 | 作用 |
 |----------|------|------|
-| [ci.yml](../.github/workflows/ci.yml) | 分支 `main`、**`release-*`**（PR / push） | 编译测试 |
-| [publish-github-packages.yml](../.github/workflows/publish-github-packages.yml) | 分支 **`release-*`** | 测试 → 发 Packages → 建 Release |
+| [ci.yml](../.github/workflows/ci.yml) | `main`、`release-*` | 编译测试 |
+| [publish-github-packages.yml](../.github/workflows/publish-github-packages.yml) | **`release-*`** | 发 GitHub Packages + Release |
+| [publish-maven-central.yml](../.github/workflows/publish-maven-central.yml) | **`central-*`** | 发 **Maven Central** |
 
-## 发布
+---
+
+## 发布到 Maven Central（推荐对外）
+
+发到中央仓后，消费方**只需依赖坐标**，不必配 GitHub Packages / `settings.xml`。
+
+### 一、一次性准备
+
+#### 1. 认领命名空间
+
+1. 打开 [central.sonatype.com](https://central.sonatype.com) 登录  
+2. **Namespaces** 中确认已有（或申请）**`io.github.whaleal-dev`**  
+3. 与当前工程 `groupId` 一致（根 `pom.xml` 已是该值）
+
+> GitHub 组织命名空间通常需按 Portal 指引完成验证（与 org `whaleal-dev` 关联）。
+
+#### 2. 生成 User Token
+
+Portal → **Account** → **Generate User Token**  
+得到用户名 + 密码（密码只显示一次，妥善保存）。
+
+#### 3. 准备 GPG 签名
+
+Maven Central **强制** GPG 签名。本机已按身份 **whaleal \<hbn.king@gmail.com\>** 生成密钥时，把下面两份内容填进 GitHub Secrets：
+
+| Secret | 本地文件 |
+|--------|----------|
+| `MAVEN_GPG_PRIVATE_KEY` | `~/.gnupg-quick-sms/maven-central-private-key.asc` |
+| `MAVEN_GPG_PASSPHRASE` | `~/.gnupg-quick-sms/maven-central-passphrase.txt` |
 
 ```bash
-git checkout -b release-1.0.1
-git push -u origin release-1.0.1
+cat ~/.gnupg-quick-sms/maven-central-private-key.asc   # → MAVEN_GPG_PRIVATE_KEY
+cat ~/.gnupg-quick-sms/maven-central-passphrase.txt    # → MAVEN_GPG_PASSPHRASE
 ```
 
-分支名 `release-1.0.1` / `release-v1.0.1` → 发布版本 `1.0.1`。
+若需重新生成：
 
-## 消费方下载 JAR
+```bash
+gpg --batch --generate-key <<'EOF'
+Key-Type: RSA
+Key-Length: 4096
+Subkey-Type: RSA
+Subkey-Length: 4096
+Name-Real: whaleal
+Name-Email: hbn.king@gmail.com
+Expire-Date: 0
+Passphrase: 你的口令
+%commit
+EOF
+gpg --list-secret-keys --keyid-format LONG
+gpg --armor --export-secret-keys KEYID > ~/.gnupg-quick-sms/maven-central-private-key.asc
+gpg --keyserver hkps://keys.openpgp.org --send-keys KEYID
+```
 
-**1. `~/.m2/settings.xml`（必配）**
+> 私钥与口令**不要**提交进 git。
+
+#### 4. 配置 GitHub Secrets
+
+仓库 **Settings → Secrets and variables → Actions** 新增：
+
+| Secret | 内容 |
+|--------|------|
+| `MAVEN_CENTRAL_USERNAME` | Portal User Token 用户名 |
+| `MAVEN_CENTRAL_PASSWORD` | Portal User Token 密码 |
+| `MAVEN_GPG_PRIVATE_KEY` | 上一步导出的私钥全文（含 `BEGIN/END PGP PRIVATE KEY BLOCK`） |
+| `MAVEN_GPG_PASSPHRASE` | 生成密钥时设置的口令 |
+
+### 二、CI 自动发布
+
+```bash
+# 确保 main 已包含待发布代码
+git checkout main && git pull
+git checkout -b central-1.0.0
+git push -u origin central-1.0.0
+```
+
+分支 `central-1.0.0` / `central-v1.0.0` → 版本 **`1.0.0`**。
+
+Actions 会：设版本 → 测试 → `mvn -Pcentral deploy`（sources / javadoc / GPG / 上传 Portal 并自动发布）。
+
+也可在 Actions 页手动跑 **Publish Maven Central**。
+
+同步延迟：Portal 显示 Published 后，通常数十分钟内可在 Central / Maven 拉取。
+
+### 三、本地手动发布（可选）
+
+`~/.m2/settings.xml`：
 
 ```xml
 <servers>
   <server>
-    <id>github</id>
-    <username>YOUR_GITHUB_USERNAME</username>
-    <password>YOUR_GITHUB_PAT</password> <!-- read:packages -->
+    <id>central</id>
+    <username>你的_User_Token_用户名</username>
+    <password>你的_User_Token_密码</password>
   </server>
 </servers>
 ```
 
-**2. 项目 `pom.xml`**
+本机需能 `gpg` 签名（密钥已导入、口令可用），然后：
+
+```bash
+# 可选：先改版本
+mvn -B versions:set -DnewVersion=1.0.0 -DgenerateBackupPoms=false -DprocessAllModules=true
+
+mvn -B -DskipTests -Pcentral clean deploy
+```
+
+---
+
+## 发布到 GitHub Packages
+
+```bash
+git checkout -b release-1.0.0 && git push -u origin release-1.0.0
+```
+
+Actions **无需**额外 Secrets（`GITHUB_TOKEN`）。  
+消费方拉 Packages 仍需 PAT，详见 README。
+
+---
+
+## 消费方依赖（发到 Central 之后）
 
 ```xml
-<repositories>
-  <repository>
-    <id>github</id>
-    <url>https://maven.pkg.github.com/whaleal-dev/quick-sms</url>
-  </repository>
-</repositories>
-
 <dependency>
-  <groupId>com.whaleal.third</groupId>
+  <groupId>io.github.whaleal-dev</groupId>
   <artifactId>sms-all</artifactId>
   <version>1.0.0</version>
 </dependency>
 ```
 
-`repository.id` 与 `server.id` 必须同为 `github`。
+无需 `<repositories>`、无需 `settings.xml`。
 
-### 方式二：源码 `mvn install`
+发 Central 之前仍可用：GitHub Packages（要认证）或源码 `mvn install`。
 
-不配 PAT 时，可把源码装到本地仓库：
-
-```bash
-git clone https://github.com/whaleal-dev/quick-sms.git
-cd quick-sms
-mvn clean install -DskipTests
-```
-
-业务项目直接依赖 `com.whaleal.third:sms-all:1.0.0`（版本与根 pom 一致），无需再写 GitHub Packages 仓库。
-
-详见仓库 README：[Maven 引入依赖](../README.md#maven-引入依赖)。
-
-返回：[文档首页](README.md)
+返回：[文档首页](README.md) · [README 引入说明](../README.md#maven-引入依赖)
