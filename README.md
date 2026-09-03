@@ -1,10 +1,25 @@
+<p align="center"><img src="https://capsule-render.vercel.app/api?type=waving&color=0:0D9488,100:0369A1&height=180&section=header&text=Quick%20SMS&fontSize=42&fontColor=ffffff&animation=fadeIn&desc=Multi-vendor%20SMS%20SDK%20%C2%B7%20Java%2021%20%C2%B7%20Domestic%20%26%20Intl&descAlignY=68" alt="Quick SMS banner" /></p>
+
+<p align="center">
+  <a href="https://central.sonatype.com/artifact/io.github.whaleal-dev/sms-all"><img src="https://img.shields.io/maven-central/v/io.github.whaleal-dev/sms-all?color=0369A1&label=Maven%20Central" alt="Maven Central" /></a>
+  <a href="docs/README.md"><img src="https://img.shields.io/badge/Docs-docs%2F-0D9488" alt="Docs" /></a>
+  <a href="https://www.apache.org/licenses/LICENSE-2.0.txt"><img src="https://img.shields.io/badge/License-Apache%202.0-1F6FEB" alt="License" /></a>
+  <img src="https://img.shields.io/badge/JDK-21-2EA043" alt="JDK 21" />
+  <img src="https://img.shields.io/badge/Spring%20Boot-3.4-6DB33F" alt="Spring Boot 3.4" />
+  <a href="https://github.com/whaleal-dev/quick-sms/actions"><img src="https://img.shields.io/github/actions/workflow/status/whaleal-dev/quick-sms/ci.yml?branch=main&label=CI" alt="CI" /></a>
+</p>
+
 # Quick SMS
 
 > **让发送短信变得更简单——同时覆盖国内与国际，面向 SaaS 多租户。**
 
 多供应商短信聚合 SDK。不必再为每家厂商单独啃文档、写签名与 HTTP 工具；用统一的 `SmsClient` / `SmsWebhookHandler` 完成发信、回执、上行与状态查询。
 
-**组织：** [whaleal-dev](https://github.com/whaleal-dev) · **仓库：** [quick-sms](https://github.com/whaleal-dev/quick-sms) · **官网：** [whaleal.com](https://whaleal.com) · **维护者：** 恒哥 · **QQ 群：** 短信网关 `1021755322`
+- 版本：`1.0.0`
+- 坐标：`io.github.whaleal-dev:sms-all`
+- GitHub：[whaleal-dev/quick-sms](https://github.com/whaleal-dev/quick-sms)
+- 官网：[whaleal.com](https://whaleal.com)
+- 维护者：恒哥 · QQ 群：短信网关 `1021755322`
 
 如果本项目帮到了你，欢迎 Star 支持。
 
