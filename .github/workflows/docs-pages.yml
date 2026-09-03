@@ -2,6 +2,7 @@
 
 # 构建 docs-site 的 Docusaurus，不是仓库根目录 Jekyll。
 # 不要再添加 jekyll-gh-pages.yml：它会把 README.md 当成站点首页。
+# 公开地址：https://whaleal.com/quick-sms/
 name: Deploy GitHub Pages
 
 on:
@@ -31,12 +32,14 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: npm
           cache-dependency-path: docs-site/package-lock.json
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Install dependencies
         run: npm ci

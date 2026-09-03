@@ -1,6 +1,6 @@
 # docs-site
 
-Quick SMS 官方 Docusaurus 文档站。发布地址：https://whaleal-dev.github.io/quick-sms/
+Quick SMS 官方 Docusaurus 文档站。发布地址：https://whaleal.com/quick-sms/
 
 ## 本地
 

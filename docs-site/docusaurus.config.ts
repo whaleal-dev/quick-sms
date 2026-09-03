@@ -2,8 +2,8 @@ import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
-/** GitHub Pages 默认地址：https://whaleal-dev.github.io/quick-sms/ */
-const siteUrl = process.env.DOCS_SITE_URL ?? 'https://whaleal-dev.github.io';
+/** 公开文档站：https://whaleal.com/quick-sms/ */
+const siteUrl = process.env.DOCS_SITE_URL ?? 'https://whaleal.com';
 const siteBaseUrl = process.env.DOCS_SITE_BASE_URL ?? '/quick-sms/';
 
 const config: Config = {

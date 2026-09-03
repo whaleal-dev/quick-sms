@@ -2,7 +2,7 @@
 
 > 让发送短信变得更简单——国内与国际统一接入，面向 SaaS 多租户。
 
-**公开文档站（推荐）：** https://whaleal-dev.github.io/quick-sms/  
+**公开文档站（推荐）：** https://whaleal.com/quick-sms/  
 源码目录：[`docs-site/`](../docs-site/README.md)（Docusaurus，与 aihub 同套发布方式）。
 
 本目录保留 Markdown 速查，内容与文档站同步维护时以 `docs-site/docs/` 为准。
