@@ -28,7 +28,7 @@ Quick SMS 的目标是：
 - **SaaS 友好**：**不强制 yml**，凭证在调用时动态传入，适合多租户
 - **网关级能力**：回执 / 上行 / 状态查询 SPI、通道 failover、Webhook 安全、限流黑名单
 
-📚 **完整文档：** [`docs/`](docs/README.md)
+📚 **完整文档：** [文档站](https://whaleal-dev.github.io/quick-sms/) · 源码 [`docs-site/`](docs-site/README.md) · Markdown 速查 [`docs/`](docs/README.md)
 
 ---
 
@@ -180,7 +180,8 @@ quick-sms/
 ├── sms-providers-intl      # 国际厂商
 ├── sms-spring-boot-starter # 自动配置（不带厂商）
 ├── sms-all                 # starter + cn + intl
-├── docs/                   # 文档站
+├── docs-site/              # Docusaurus 文档站（GitHub Pages）
+├── docs/                   # Markdown 速查（与文档站内容互补）
 └── examples/               # 示例代码
 ```
 
@@ -195,6 +196,8 @@ quick-sms/
 
 ## 文档导航
 
+公开站点：[https://whaleal-dev.github.io/quick-sms/](https://whaleal-dev.github.io/quick-sms/)（出站 / 入站 / Report / Webhook 等概念见「短信概念」）。
+
 | 文档 | 内容 |
 |------|------|
 | [前言](docs/intro.md) | 设计理念与适用场景 |
@@ -204,6 +207,7 @@ quick-sms/
 | [API 详解](docs/api.md) | 核心类型与错误码 |
 | [厂商接入](docs/providers.md) | 各厂商凭证与回调 |
 | [CI / CD](docs/ci-cd.md) | 自动构建与发布到 Maven Central |
+| [文档站维护](docs-site/README.md) | 本地预览与 Pages 发布 |
 | [示例](examples/README.md) | 可复制代码 |
 | [变更记录](CHANGELOG.md) | 版本说明 |
 
