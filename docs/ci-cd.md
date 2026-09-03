@@ -13,7 +13,9 @@
 |----------|------|------|
 | [ci.yml](../.github/workflows/ci.yml) | `main`、`release-*` | 编译测试 |
 | [publish-github-packages.yml](../.github/workflows/publish-github-packages.yml) | **`release-*`** | 发 GitHub Packages + Release |
-| [publish-maven-central.yml](../.github/workflows/publish-maven-central.yml) | **`central-*`** | 发 **Maven Central** |
+| [publish-maven-central.yml](../.github/workflows/publish-maven-central.yml) | **`release-*`** | 发 **Maven Central** |
+
+> 推送 **`release-x.y.z`** 会同时触发 Packages 与 Maven Central 发布。
 
 ---
 
@@ -87,15 +89,18 @@ gpg --keyserver hkps://keys.openpgp.org --send-keys KEYID
 ```bash
 # 确保 main 已包含待发布代码
 git checkout main && git pull
-git checkout -b central-1.0.0
-git push -u origin central-1.0.0
+git checkout -b release-1.0.0
+git push -u origin release-1.0.0
 ```
 
-分支 `central-1.0.0` / `central-v1.0.0` → 版本 **`1.0.0`**。
+分支 `release-1.0.0` / `release-v1.0.0` → 版本 **`1.0.0`**。
 
-Actions 会：设版本 → 测试 → `mvn -Pcentral deploy`（sources / javadoc / GPG / 上传 Portal 并自动发布）。
+同一推送会触发：
 
-也可在 Actions 页手动跑 **Publish Maven Central**。
+1. **Publish Maven Central**（`mvn -Pcentral deploy`）
+2. **Publish GitHub Packages**（可选并存）
+
+也可在 Actions 页手动跑对应 workflow。
 
 同步延迟：Portal 显示 Published 后，通常数十分钟内可在 Central / Maven 拉取。
 

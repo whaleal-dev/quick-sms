@@ -1,7 +1,7 @@
 # 发布到 Maven Central（Sonatype Central Portal）
 #
 # 触发：
-#   - push 分支：central-1.0.0 / central-v1.0.0
+#   - push 分支：release-1.0.0 / release-v1.0.0
 #   - 手动 workflow_dispatch
 #
 # 仓库 Secrets（Settings → Secrets and variables → Actions）：
@@ -16,11 +16,11 @@ name: Publish Maven Central
 on:
   push:
     branches:
-      - 'central-*'
+      - 'release-*'
   workflow_dispatch:
     inputs:
       version:
-        description: '覆盖版本号（留空则从分支名解析，如 central-1.0.0）'
+        description: '覆盖版本号（留空则从分支名解析，如 release-1.0.0）'
         required: false
         type: string
       skip_tests:
@@ -55,12 +55,12 @@ jobs:
             VERSION="${INPUT_VERSION#v}"
           else
             REF_NAME="${GITHUB_REF_NAME}"
-            # central-1.0.0 / central-v1.0.0 → 1.0.0
-            VERSION="${REF_NAME#central-}"
+            # release-1.0.0 / release-v1.0.0 → 1.0.0
+            VERSION="${REF_NAME#release-}"
             VERSION="${VERSION#v}"
           fi
           if [ -z "${VERSION}" ] || [[ ! "${VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-].+)?$ ]]; then
-            echo "::error::无法解析版本号。请使用分支 central-x.y.z，或手动传入 version。当前: ${VERSION:-empty}"
+            echo "::error::无法解析版本号。请使用分支 release-x.y.z，或手动传入 version。当前: ${VERSION:-empty}"
             exit 1
           fi
           if [[ "${VERSION}" == *-SNAPSHOT ]]; then

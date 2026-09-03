@@ -95,53 +95,11 @@ Quick SMS 的目标是：
 
 坐标：`io.github.whaleal-dev:sms-all:<version>`（Java 包名仍为 `com.whaleal...`，不变）。
 
-发到 **Maven Central** 后，推荐只写依赖（无需仓库、无需 `settings.xml`）：
+#### 推荐：Maven Central
+
+发到中央仓后，**只需依赖**（无需 `<repositories>`、无需 `settings.xml`）：
 
 ```xml
-<dependency>
-  <groupId>io.github.whaleal-dev</groupId>
-  <artifactId>sms-all</artifactId>
-  <version>1.0.0</version>
-</dependency>
-```
-
-发布到中央仓的步骤见 **[CI / CD：Maven Central](docs/ci-cd.md#发布到-maven-central推荐对外)**。  
-在尚未出现在 Central 之前，可用下面两种方式。
-
-#### 方式一：从 GitHub Packages 拉取
-
-JAR 在 [GitHub Packages](https://github.com/whaleal-dev/quick-sms/packages)。
-
-> **注意：** 即便包是公开的，GitHub Packages 的 Maven 仓库仍要求认证，不能像中央仓库那样匿名下载。需同时配置 `settings.xml`（PAT）与 `pom.xml`（仓库地址）。
-
-**1. 配置认证**（`~/.m2/settings.xml`）
-
-创建 [Personal Access Token (classic)](https://github.com/settings/tokens)，勾选 **`read:packages`**。  
-`<server><id>` 必须与下面仓库的 `<id>` 一致（均为 `github`）。
-
-```xml
-<settings>
-  <servers>
-    <server>
-      <id>github</id>
-      <username>YOUR_GITHUB_USERNAME</username>
-      <password>YOUR_GITHUB_PAT</password>
-    </server>
-  </servers>
-</settings>
-```
-
-**2. 配置仓库地址并添加依赖**（项目 `pom.xml`）
-
-```xml
-<repositories>
-  <repository>
-    <id>github</id>
-    <name>GitHub Packages (quick-sms)</name>
-    <url>https://maven.pkg.github.com/whaleal-dev/quick-sms</url>
-  </repository>
-</repositories>
-
 <!-- 推荐：国内 + 国际全量 -->
 <dependency>
   <groupId>io.github.whaleal-dev</groupId>
@@ -152,11 +110,33 @@ JAR 在 [GitHub Packages](https://github.com/whaleal-dev/quick-sms/packages)。
 
 或按需：`sms-spring-boot-starter` + `sms-providers-cn` / `sms-providers-intl`。
 
-> 版本以 Packages / Release / Central 页面为准。
+> 推送分支 `release-x.y.z` 会自动发布到 Maven Central。查版本：[Central Search](https://central.sonatype.com) · 发布说明见 [CI / CD](docs/ci-cd.md)。
 
-#### 方式二：源码 `mvn install`（无需 Packages 认证）
+#### 备选：GitHub Packages
 
-适合本地开发、不想配置 PAT 的场景：把模块安装到本机 `~/.m2/repository`，业务项目直接依赖即可。
+若 Central 尚未同步，可从 [GitHub Packages](https://github.com/whaleal-dev/quick-sms/packages) 拉取。公开包仍需认证：
+
+1. `~/.m2/settings.xml` 配置 `server.id=github` + PAT（`read:packages`）
+2. 项目 `pom.xml` 增加仓库并引入依赖：
+
+```xml
+<repositories>
+  <repository>
+    <id>github</id>
+    <url>https://maven.pkg.github.com/whaleal-dev/quick-sms</url>
+  </repository>
+</repositories>
+
+<dependency>
+  <groupId>io.github.whaleal-dev</groupId>
+  <artifactId>sms-all</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
+#### 备选：源码 `mvn install`
+
+本地开发、不配 PAT 时：
 
 ```bash
 git clone https://github.com/whaleal-dev/quick-sms.git
@@ -164,21 +144,7 @@ cd quick-sms
 mvn clean install -DskipTests
 ```
 
-安装成功后，业务项目 `pom.xml` **不必**再配 GitHub Packages 仓库，直接写依赖：
-
-```xml
-<dependency>
-  <groupId>io.github.whaleal-dev</groupId>
-  <artifactId>sms-all</artifactId>
-  <version>1.0.0</version> <!-- 与根 pom 中 <version> 一致 -->
-</dependency>
-```
-
-说明：
-
-- 需本机已安装 **JDK 21** 与 Maven
-- `install` 会安装全部子模块（`sms-api` / `sms-runtime` / `sms-providers-*` / `sms-all` 等）
-- 若只想打本地包不跑测试，可用上面的 `-DskipTests`；完整校验用 `mvn clean install`
+业务项目直接依赖 `io.github.whaleal-dev:sms-all:1.0.0`（与根 pom 版本一致）即可。需 **JDK 21**。
 
 ### 纯 Java（无需 yml）
 
@@ -296,21 +262,15 @@ Java 21 · Spring Boot 3.4.x
 |------|------|----------|---------|
 | 构建测试 | PR / push `main`、`release-*` | [ci.yml](.github/workflows/ci.yml) | 无 |
 | GitHub Packages | 分支 **`release-*`** | [publish-github-packages.yml](.github/workflows/publish-github-packages.yml) | 无 |
-| **Maven Central** | 分支 **`central-*`** | [publish-maven-central.yml](.github/workflows/publish-maven-central.yml) | 见下 |
+| **Maven Central** | 分支 **`release-*`** | [publish-maven-central.yml](.github/workflows/publish-maven-central.yml) | 见下 |
 
-**发中央仓（推荐对外）：**
-
-```bash
-git checkout -b central-1.0.0 && git push -u origin central-1.0.0
-```
-
-需在仓库配置 Secrets：`MAVEN_CENTRAL_USERNAME`、`MAVEN_CENTRAL_PASSWORD`、`MAVEN_GPG_PRIVATE_KEY`、`MAVEN_GPG_PASSPHRASE`。命名空间须为 **`io.github.whaleal-dev`**。
-
-**发 GitHub Packages：**
+**发布（Packages + Maven Central）：**
 
 ```bash
 git checkout -b release-1.0.0 && git push -u origin release-1.0.0
 ```
+
+Maven Central 需配置 Secrets：`MAVEN_CENTRAL_USERNAME`、`MAVEN_CENTRAL_PASSWORD`、`MAVEN_GPG_PRIVATE_KEY`、`MAVEN_GPG_PASSPHRASE`。命名空间须为 **`io.github.whaleal-dev`**。
 
 消费方引入方式见 **[Maven 引入依赖](#maven-引入依赖)**。
 

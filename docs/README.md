@@ -27,7 +27,7 @@ SmsClient client = SmsClients.builder()
 client.sendText("13800138000", "【QuickSMS】验证码 1234");
 ```
 
-Maven 坐标：`io.github.whaleal-dev:sms-all:1.0.0`（或 starter + providers 按需组合）。
+Maven 坐标：`io.github.whaleal-dev:sms-all:1.0.0`（发到 Central 后可直接依赖；或 starter + providers 按需组合）。
 
 ## 设计要点（务必读）
 

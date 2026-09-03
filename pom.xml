@@ -191,7 +191,7 @@
     <profiles>
         <!--
           Maven Central（Sonatype Central Portal）。
-          CI：push central-* → mvn -Pcentral deploy
+          CI：push release-* → mvn -Pcentral deploy
           本地：mvn -Pcentral clean deploy
         -->
         <profile>
