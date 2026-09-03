@@ -4,7 +4,6 @@
 
 | 目标 | 地址 |
 |------|------|
-| GitHub Packages | `https://maven.pkg.github.com/whaleal-dev/quick-sms` |
 | Maven Central | 坐标 `io.github.whaleal-dev:*`（发成功后可在 [Central Search](https://central.sonatype.com) 查） |
 
 ## 工作流
@@ -12,16 +11,15 @@
 | Workflow | 监听 | 作用 |
 |----------|------|------|
 | [ci.yml](../.github/workflows/ci.yml) | `main`、`release-*` | 编译测试 |
-| [publish-github-packages.yml](../.github/workflows/publish-github-packages.yml) | **`release-*`** | 发 GitHub Packages + Release |
 | [publish-maven-central.yml](../.github/workflows/publish-maven-central.yml) | **`release-*`** | 发 **Maven Central** |
 
-> 推送 **`release-x.y.z`** 会同时触发 Packages 与 Maven Central 发布。
+> 推送 **`release-x.y.z`** 触发 Maven Central 发布。
 
 ---
 
 ## 发布到 Maven Central（推荐对外）
 
-发到中央仓后，消费方**只需依赖坐标**，不必配 GitHub Packages / `settings.xml`。
+发到中央仓后，消费方**只需依赖坐标**（无需 `settings.xml`）。
 
 ### 一、一次性准备
 
@@ -98,9 +96,9 @@ git push -u origin release-1.0.0
 同一推送会触发：
 
 1. **Publish Maven Central**（`mvn -Pcentral deploy`）
-2. **Publish GitHub Packages**（可选并存）
+2. CI 构建测试
 
-也可在 Actions 页手动跑对应 workflow。
+也可在 Actions 页手动跑 **Publish Maven Central**。
 
 同步延迟：Portal 显示 Published 后，通常数十分钟内可在 Central / Maven 拉取。
 
@@ -129,17 +127,6 @@ mvn -B -DskipTests -Pcentral clean deploy
 
 ---
 
-## 发布到 GitHub Packages
-
-```bash
-git checkout -b release-1.0.0 && git push -u origin release-1.0.0
-```
-
-Actions **无需**额外 Secrets（`GITHUB_TOKEN`）。  
-消费方拉 Packages 仍需 PAT，详见 README。
-
----
-
 ## 消费方依赖（发到 Central 之后）
 
 ```xml
@@ -150,8 +137,6 @@ Actions **无需**额外 Secrets（`GITHUB_TOKEN`）。
 </dependency>
 ```
 
-无需 `<repositories>`、无需 `settings.xml`。
-
-发 Central 之前仍可用：GitHub Packages（要认证）或源码 `mvn install`。
+无需 `<repositories>`、无需 `settings.xml`。本地开发也可用源码 `mvn install`。
 
 返回：[文档首页](README.md) · [README 引入说明](../README.md#maven-引入依赖)

@@ -95,9 +95,7 @@ Quick SMS 的目标是：
 
 坐标：`io.github.whaleal-dev:sms-all:<version>`（Java 包名仍为 `com.whaleal...`，不变）。
 
-#### 推荐：Maven Central
-
-发到中央仓后，**只需依赖**（无需 `<repositories>`、无需 `settings.xml`）：
+发到 **Maven Central** 后，**只需依赖**（无需 `<repositories>`、无需 `settings.xml`）：
 
 ```xml
 <!-- 推荐：国内 + 国际全量 -->
@@ -112,31 +110,7 @@ Quick SMS 的目标是：
 
 > 推送分支 `release-x.y.z` 会自动发布到 Maven Central。查版本：[Central Search](https://central.sonatype.com) · 发布说明见 [CI / CD](docs/ci-cd.md)。
 
-#### 备选：GitHub Packages
-
-若 Central 尚未同步，可从 [GitHub Packages](https://github.com/whaleal-dev/quick-sms/packages) 拉取。公开包仍需认证：
-
-1. `~/.m2/settings.xml` 配置 `server.id=github` + PAT（`read:packages`）
-2. 项目 `pom.xml` 增加仓库并引入依赖：
-
-```xml
-<repositories>
-  <repository>
-    <id>github</id>
-    <url>https://maven.pkg.github.com/whaleal-dev/quick-sms</url>
-  </repository>
-</repositories>
-
-<dependency>
-  <groupId>io.github.whaleal-dev</groupId>
-  <artifactId>sms-all</artifactId>
-  <version>1.0.0</version>
-</dependency>
-```
-
-#### 备选：源码 `mvn install`
-
-本地开发、不配 PAT 时：
+#### 本地开发：源码 `mvn install`
 
 ```bash
 git clone https://github.com/whaleal-dev/quick-sms.git
@@ -222,7 +196,7 @@ quick-sms/
 | [进阶配置](docs/features.md) | Failover、限流、安全、指标、代理 |
 | [API 详解](docs/api.md) | 核心类型与错误码 |
 | [厂商接入](docs/providers.md) | 各厂商凭证与回调 |
-| [CI / CD](docs/ci-cd.md) | 自动构建与发布到 GitHub Packages |
+| [CI / CD](docs/ci-cd.md) | 自动构建与发布到 Maven Central |
 | [示例](examples/README.md) | 可复制代码 |
 | [变更记录](CHANGELOG.md) | 版本说明 |
 
@@ -261,16 +235,13 @@ Java 21 · Spring Boot 3.4.x
 | 场景 | 触发 | Workflow | Secrets |
 |------|------|----------|---------|
 | 构建测试 | PR / push `main`、`release-*` | [ci.yml](.github/workflows/ci.yml) | 无 |
-| GitHub Packages | 分支 **`release-*`** | [publish-github-packages.yml](.github/workflows/publish-github-packages.yml) | 无 |
-| **Maven Central** | 分支 **`release-*`** | [publish-maven-central.yml](.github/workflows/publish-maven-central.yml) | 见下 |
-
-**发布（Packages + Maven Central）：**
+| **发布 Maven Central** | 分支 **`release-*`** | [publish-maven-central.yml](.github/workflows/publish-maven-central.yml) | 见下 |
 
 ```bash
 git checkout -b release-1.0.0 && git push -u origin release-1.0.0
 ```
 
-Maven Central 需配置 Secrets：`MAVEN_CENTRAL_USERNAME`、`MAVEN_CENTRAL_PASSWORD`、`MAVEN_GPG_PRIVATE_KEY`、`MAVEN_GPG_PASSPHRASE`。命名空间须为 **`io.github.whaleal-dev`**。
+需配置 Secrets：`MAVEN_CENTRAL_USERNAME`、`MAVEN_CENTRAL_PASSWORD`、`MAVEN_GPG_PRIVATE_KEY`、`MAVEN_GPG_PASSPHRASE`。命名空间须为 **`io.github.whaleal-dev`**。
 
 消费方引入方式见 **[Maven 引入依赖](#maven-引入依赖)**。
 
