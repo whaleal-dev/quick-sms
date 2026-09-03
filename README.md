@@ -1,13 +1,5 @@
-<p align="center"><img src="https://capsule-render.vercel.app/api?type=waving&color=0:0D9488,100:0369A1&height=180&section=header&text=Quick%20SMS&fontSize=42&fontColor=ffffff&animation=fadeIn&desc=Multi-vendor%20SMS%20SDK%20%C2%B7%20Java%2021%20%C2%B7%20Domestic%20%26%20Intl&descAlignY=68" alt="Quick SMS banner" /></p>
-
-<p align="center">
-  <a href="https://central.sonatype.com/artifact/io.github.whaleal-dev/sms-all"><img src="https://img.shields.io/maven-central/v/io.github.whaleal-dev/sms-all?color=0369A1&label=Maven%20Central" alt="Maven Central" /></a>
-  <a href="docs/README.md"><img src="https://img.shields.io/badge/Docs-docs%2F-0D9488" alt="Docs" /></a>
-  <a href="https://www.apache.org/licenses/LICENSE-2.0.txt"><img src="https://img.shields.io/badge/License-Apache%202.0-1F6FEB" alt="License" /></a>
-  <img src="https://img.shields.io/badge/JDK-21-2EA043" alt="JDK 21" />
-  <img src="https://img.shields.io/badge/Spring%20Boot-3.4-6DB33F" alt="Spring Boot 3.4" />
-  <a href="https://github.com/whaleal-dev/quick-sms/actions"><img src="https://img.shields.io/github/actions/workflow/status/whaleal-dev/quick-sms/ci.yml?branch=main&label=CI" alt="CI" /></a>
-</p>
+<p align="center"><img src="https://capsule-render.vercel.app/api?type=waving&color=0:6A5ACD,100:2E86C1&height=180&section=header&text=aihub&fontSize=46&fontColor=ffffff&animation=fadeIn&desc=Java%20LLM%20client%20for%20JDK%208%2B&descAlignY=68" alt="aihub banner" /></p>
+<p align="center"><a href="https://search.maven.org/artifact/io.github.whaleal-dev/quick-sms"><img src="https://img.shields.io/maven-central/v/io.github.whaleal-dev/quick-sms?color=2E86C1&label=Maven%20Central" alt="Maven Central" /></a> <a href="https://whaleal-dev.github.io/quick-sms/"><img src="https://img.shields.io/badge/Docs-GitHub%20Pages-0A7EA4" alt="Docs" /></a> <a href="https://www.apache.org/licenses/LICENSE-2.0.txt"><img src="https://img.shields.io/badge/License-Apache%202.0-1F6FEB" alt="License" /></a> <img src="https://img.shields.io/badge/JDK-8%2B-2EA043" alt="JDK 8+" /> <a href="https://www.orcarouter.ai/ref/ref_76f80b88a83930469424"><img src="https://img.shields.io/badge/Powered_by-OrcaRouter-2563eb" alt="Powered by OrcaRouter" /></a></p>
 
 # Quick SMS
 
