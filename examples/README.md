@@ -22,7 +22,7 @@ client.sendText("13800138000", "【QuickSMS】验证码 1234");
 
 ```xml
 <dependency>
-  <groupId>io.github.whaleal-dev</groupId>
+  <groupId>com.whaleal</groupId>
   <artifactId>sms-all</artifactId>
   <version>1.0.0</version>
 </dependency>

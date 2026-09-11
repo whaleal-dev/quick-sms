@@ -1,5 +1,5 @@
 <p align="center"><img src="https://capsule-render.vercel.app/api?type=waving&color=0:6A5ACD,100:2E86C1&height=180&section=header&text=Quick%20SMS&fontSize=46&fontColor=ffffff&animation=fadeIn&desc=Multi-vendor%20SMS%20SDK%20for%20JDK%2021&descAlignY=68" alt="Quick SMS banner" /></p>
-<p align="center"><a href="https://search.maven.org/artifact/io.github.whaleal-dev/sms-all"><img src="https://img.shields.io/maven-central/v/io.github.whaleal-dev/sms-all?color=2E86C1&label=Maven%20Central" alt="Maven Central" /></a> <a href="https://whaleal.com/quick-sms/"><img src="https://img.shields.io/badge/Docs-whaleal.com%2Fquick--sms-0A7EA4" alt="Docs" /></a> <a href="https://www.apache.org/licenses/LICENSE-2.0.txt"><img src="https://img.shields.io/badge/License-Apache%202.0-1F6FEB" alt="License" /></a> <img src="https://img.shields.io/badge/JDK-21-2EA043" alt="JDK 21" /> <img src="https://img.shields.io/badge/Spring%20Boot-3.4-6DB33F" alt="Spring Boot 3.4" /> <a href="https://github.com/whaleal-dev/quick-sms/actions"><img src="https://img.shields.io/github/actions/workflow/status/whaleal-dev/quick-sms/ci.yml?branch=main&label=CI" alt="CI" /></a> <a href="https://github.com/whaleal-dev/quick-sms/stargazers"><img src="https://img.shields.io/github/stars/whaleal-dev/quick-sms?style=flat&color=yellow" alt="GitHub stars" /></a></p>
+<p align="center"><a href="https://search.maven.org/artifact/com.whaleal/sms-all"><img src="https://img.shields.io/maven-central/v/com.whaleal/sms-all?color=2E86C1&label=Maven%20Central" alt="Maven Central" /></a> <a href="https://whaleal.com/quick-sms/"><img src="https://img.shields.io/badge/Docs-whaleal.com%2Fquick--sms-0A7EA4" alt="Docs" /></a> <a href="https://www.apache.org/licenses/LICENSE-2.0.txt"><img src="https://img.shields.io/badge/License-Apache%202.0-1F6FEB" alt="License" /></a> <img src="https://img.shields.io/badge/JDK-21-2EA043" alt="JDK 21" /> <img src="https://img.shields.io/badge/Spring%20Boot-3.4-6DB33F" alt="Spring Boot 3.4" /> <a href="https://github.com/whaleal-dev/quick-sms/actions"><img src="https://img.shields.io/github/actions/workflow/status/whaleal-dev/quick-sms/ci.yml?branch=main&label=CI" alt="CI" /></a> <a href="https://github.com/whaleal-dev/quick-sms/stargazers"><img src="https://img.shields.io/github/stars/whaleal-dev/quick-sms?style=flat&color=yellow" alt="GitHub stars" /></a></p>
 
 # Quick SMS
 
@@ -8,7 +8,7 @@
 多供应商短信聚合 SDK。不必再为每家厂商单独啃文档、写签名与 HTTP 工具；用统一的 `SmsClient` / `SmsWebhookHandler` 完成发信、回执、上行与状态查询。
 
 - 版本：`1.0.0`
-- 坐标：`io.github.whaleal-dev:sms-all`
+- 坐标：`com.whaleal:sms-all`
 - GitHub：[whaleal-dev/quick-sms](https://github.com/whaleal-dev/quick-sms)
 - 官网：[whaleal.com](https://whaleal.com)
 - 维护者：恒哥 · QQ 群：短信网关 `1021755322`
@@ -100,14 +100,14 @@ Quick SMS 的目标是：
 
 ### Maven 引入依赖
 
-坐标：`io.github.whaleal-dev:sms-all:<version>`（Java 包名仍为 `com.whaleal...`，不变）。
+坐标：`com.whaleal:sms-all:<version>`（Java 包名仍为 `com.whaleal...`，不变）。
 
 发到 **Maven Central** 后，**只需依赖**（无需 `<repositories>`、无需 `settings.xml`）：
 
 ```xml
 <!-- 推荐：国内 + 国际全量 -->
 <dependency>
-  <groupId>io.github.whaleal-dev</groupId>
+  <groupId>com.whaleal</groupId>
   <artifactId>sms-all</artifactId>
   <version>1.0.0</version>
 </dependency>
@@ -125,7 +125,7 @@ cd quick-sms
 mvn clean install -DskipTests
 ```
 
-业务项目直接依赖 `io.github.whaleal-dev:sms-all:1.0.0`（与根 pom 版本一致）即可。需 **JDK 21**。
+业务项目直接依赖 `com.whaleal:sms-all:1.0.0`（与根 pom 版本一致）即可。需 **JDK 21**。
 
 ### 纯 Java（无需 yml）
 
@@ -252,7 +252,7 @@ Java 21 · Spring Boot 3.4.x
 git checkout -b release-1.0.0 && git push -u origin release-1.0.0
 ```
 
-需配置 Secrets：`MAVEN_CENTRAL_USERNAME`、`MAVEN_CENTRAL_PASSWORD`、`MAVEN_GPG_PRIVATE_KEY`、`MAVEN_GPG_PASSPHRASE`。命名空间须为 **`io.github.whaleal-dev`**。
+需配置 Secrets：`MAVEN_CENTRAL_USERNAME`、`MAVEN_CENTRAL_PASSWORD`、`MAVEN_GPG_PRIVATE_KEY`、`MAVEN_GPG_PASSPHRASE`。命名空间须为 **`com.whaleal`**。
 
 消费方引入方式见 **[Maven 引入依赖](#maven-引入依赖)**。
 

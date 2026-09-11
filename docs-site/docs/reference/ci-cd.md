@@ -4,7 +4,7 @@
 
 | 目标 | 地址 |
 |------|------|
-| Maven Central | 坐标 `io.github.whaleal-dev:*`（发成功后可在 [Central Search](https://central.sonatype.com) 查） |
+| Maven Central | 坐标 `com.whaleal:*`（发成功后可在 [Central Search](https://central.sonatype.com) 查） |
 
 ## 工作流
 
@@ -26,10 +26,10 @@
 #### 1. 认领命名空间
 
 1. 打开 [central.sonatype.com](https://central.sonatype.com) 登录  
-2. **Namespaces** 中确认已有（或申请）**`io.github.whaleal-dev`**  
+2. **Namespaces** 中确认已有（或申请）**`com.whaleal`**  
 3. 与当前工程 `groupId` 一致（根 `pom.xml` 已是该值）
 
-> GitHub 组织命名空间通常需按 Portal 指引完成验证（与 org `whaleal-dev` 关联）。
+> 域名命名空间 `com.whaleal` 需按 Portal 指引完成验证（与 [whaleal.com](https://whaleal.com) 关联）。
 
 #### 2. 生成 User Token
 
@@ -131,7 +131,7 @@ mvn -B -DskipTests -Pcentral clean deploy
 
 ```xml
 <dependency>
-  <groupId>io.github.whaleal-dev</groupId>
+  <groupId>com.whaleal</groupId>
   <artifactId>sms-all</artifactId>
   <version>1.0.0</version>
 </dependency>

@@ -11,7 +11,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>io.github.whaleal-dev</groupId>
+    <groupId>com.whaleal</groupId>
     <artifactId>quick-sms</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
@@ -21,7 +21,7 @@
     <url>https://github.com/whaleal-dev/quick-sms</url>
 
     <organization>
-        <name>whaleal-dev</name>
+        <name>com.whaleal</name>
         <url>https://whaleal.com</url>
     </organization>
 
@@ -79,37 +79,37 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>io.github.whaleal-dev</groupId>
+                <groupId>com.whaleal</groupId>
                 <artifactId>sms-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.whaleal-dev</groupId>
+                <groupId>com.whaleal</groupId>
                 <artifactId>sms-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.whaleal-dev</groupId>
+                <groupId>com.whaleal</groupId>
                 <artifactId>sms-runtime</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.whaleal-dev</groupId>
+                <groupId>com.whaleal</groupId>
                 <artifactId>sms-providers-cn</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.whaleal-dev</groupId>
+                <groupId>com.whaleal</groupId>
                 <artifactId>sms-providers-intl</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.whaleal-dev</groupId>
+                <groupId>com.whaleal</groupId>
                 <artifactId>sms-spring-boot-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.whaleal-dev</groupId>
+                <groupId>com.whaleal</groupId>
                 <artifactId>sms-all</artifactId>
                 <version>${project.version}</version>
             </dependency>

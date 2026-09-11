@@ -104,7 +104,7 @@ jobs:
 
             ```xml
             <dependency>
-              <groupId>io.github.whaleal-dev</groupId>
+              <groupId>com.whaleal</groupId>
               <artifactId>sms-all</artifactId>
               <version>${{ steps.ver.outputs.version }}</version>
             </dependency>

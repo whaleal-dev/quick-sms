@@ -12,7 +12,7 @@
 
 ```xml
 <dependency>
-    <groupId>io.github.whaleal-dev</groupId>
+    <groupId>com.whaleal</groupId>
     <artifactId>sms-all</artifactId>
     <version>1.0.0</version>
 </dependency>
@@ -23,21 +23,21 @@
 ```xml
 <!-- 自动配置 SmsClient / SmsWebhookHandler，不带厂商 -->
 <dependency>
-    <groupId>io.github.whaleal-dev</groupId>
+    <groupId>com.whaleal</groupId>
     <artifactId>sms-spring-boot-starter</artifactId>
     <version>1.0.0</version>
 </dependency>
 
 <!-- 国内厂商 SPI -->
 <dependency>
-    <groupId>io.github.whaleal-dev</groupId>
+    <groupId>com.whaleal</groupId>
     <artifactId>sms-providers-cn</artifactId>
     <version>1.0.0</version>
 </dependency>
 
 <!-- 需要国际时再加 -->
 <dependency>
-    <groupId>io.github.whaleal-dev</groupId>
+    <groupId>com.whaleal</groupId>
     <artifactId>sms-providers-intl</artifactId>
     <version>1.0.0</version>
 </dependency>

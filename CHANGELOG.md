@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+- Maven `groupId`：`io.github.whaleal-dev` → `com.whaleal`（Java 包名不变）
+- Maven Central 命名空间改为 **`com.whaleal`**
+
 ## 1.0.1 — 2026-08-17
 
 ### Changed
