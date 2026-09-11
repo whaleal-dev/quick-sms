@@ -1,6 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+- Maven `groupId`：`io.github.whaleal-dev` → `com.whaleal`（Java 包名不变）
+- Maven Central 命名空间改为 **`com.whaleal`**
+
 ## 1.0.1 — 2026-08-17
+
+### Changed
+- Maven `groupId`：`com.whaleal.third` → `io.github.whaleal-dev`（Java 包名不变）
 
 ### Added
 - 吸收 [easy-sms](https://github.com/overtrue/easy-sms) 能力：
@@ -8,7 +17,7 @@
   - 新增国内厂商：短信宝、互亿无线、聚合数据、云之讯、SendCloud、华信、火山引擎
 - `ProviderHttp.get`：支持短信宝 / 聚合等 GET 接口
 - GitHub Packages 发布：默认 `distributionManagement` 指向本仓库；新增 `publish-github-packages.yml`
-- CI/CD：`ci.yml`（PR/main 构建测试）；推送 **`release-*`** 分支自动发布到 GitHub Packages 并创建 Release
+- CI/CD：推送 **`release-*`** 同时发布 GitHub Packages 与 Maven Central；`ci.yml` 监听 `main` / `release-*`
 
 ### Changed
 - README / `docs/providers.md` 厂商表同步

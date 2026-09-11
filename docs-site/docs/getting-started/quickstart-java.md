@@ -103,6 +103,6 @@ SmsReceipt receipt = handler.parseReceipt(SmsProviderType.YUNPIAN, payload);
 
 ## 6. 示例源码
 
-见仓库 [`examples/plain-java`](../examples/plain-java)。
+见仓库 [`examples/plain-java`](https://github.com/whaleal-dev/quick-sms/tree/main/examples/plain-java)。
 
-下一篇：[进阶能力](features.md) · [API 详解](api.md)
+下一篇：[进阶能力](../guide/features.md) · [API 详解](../guide/api.md)

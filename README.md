@@ -1,10 +1,17 @@
+<p align="center"><img src="https://capsule-render.vercel.app/api?type=waving&color=0:6A5ACD,100:2E86C1&height=180&section=header&text=Quick%20SMS&fontSize=46&fontColor=ffffff&animation=fadeIn&desc=Multi-vendor%20SMS%20SDK%20for%20JDK%2021&descAlignY=68" alt="Quick SMS banner" /></p>
+<p align="center"><a href="https://search.maven.org/artifact/com.whaleal/sms-all"><img src="https://img.shields.io/maven-central/v/com.whaleal/sms-all?color=2E86C1&label=Maven%20Central" alt="Maven Central" /></a> <a href="https://whaleal.com/quick-sms/"><img src="https://img.shields.io/badge/Docs-whaleal.com%2Fquick--sms-0A7EA4" alt="Docs" /></a> <a href="https://www.apache.org/licenses/LICENSE-2.0.txt"><img src="https://img.shields.io/badge/License-Apache%202.0-1F6FEB" alt="License" /></a> <img src="https://img.shields.io/badge/JDK-21-2EA043" alt="JDK 21" /> <img src="https://img.shields.io/badge/Spring%20Boot-3.4-6DB33F" alt="Spring Boot 3.4" /> <a href="https://github.com/whaleal-dev/quick-sms/actions"><img src="https://img.shields.io/github/actions/workflow/status/whaleal-dev/quick-sms/ci.yml?branch=main&label=CI" alt="CI" /></a> <a href="https://github.com/whaleal-dev/quick-sms/stargazers"><img src="https://img.shields.io/github/stars/whaleal-dev/quick-sms?style=flat&color=yellow" alt="GitHub stars" /></a></p>
+
 # Quick SMS
 
 > **让发送短信变得更简单——同时覆盖国内与国际，面向 SaaS 多租户。**
 
 多供应商短信聚合 SDK。不必再为每家厂商单独啃文档、写签名与 HTTP 工具；用统一的 `SmsClient` / `SmsWebhookHandler` 完成发信、回执、上行与状态查询。
 
-**组织：** [whaleal-dev](https://github.com/whaleal-dev) · **仓库：** [quick-sms](https://github.com/whaleal-dev/quick-sms) · **官网：** [whaleal.com](https://whaleal.com) · **维护者：** 恒哥 · **QQ 群：** 短信网关 `1021755322`
+- 版本：`1.0.0`
+- 坐标：`com.whaleal:sms-all`
+- GitHub：[whaleal-dev/quick-sms](https://github.com/whaleal-dev/quick-sms)
+- 官网：[whaleal.com](https://whaleal.com)
+- 维护者：恒哥 · QQ 群：短信网关 `1021755322`
 
 如果本项目帮到了你，欢迎 Star 支持。
 
@@ -21,7 +28,7 @@ Quick SMS 的目标是：
 - **SaaS 友好**：**不强制 yml**，凭证在调用时动态传入，适合多租户
 - **网关级能力**：回执 / 上行 / 状态查询 SPI、通道 failover、Webhook 安全、限流黑名单
 
-📚 **完整文档：** [`docs/`](docs/README.md)
+📚 **完整文档：** [文档站](https://whaleal.com/quick-sms/) · 源码 [`docs-site/`](docs-site/README.md) · Markdown 速查 [`docs/`](docs/README.md)
 
 ---
 
@@ -91,18 +98,34 @@ Quick SMS 的目标是：
 
 ## 30 秒上手
 
-### Maven
+### Maven 引入依赖
+
+坐标：`com.whaleal:sms-all:<version>`（Java 包名仍为 `com.whaleal...`，不变）。
+
+发到 **Maven Central** 后，**只需依赖**（无需 `<repositories>`、无需 `settings.xml`）：
 
 ```xml
 <!-- 推荐：国内 + 国际全量 -->
 <dependency>
-    <groupId>com.whaleal.third</groupId>
-    <artifactId>sms-all</artifactId>
-    <version>1.0.0</version>
+  <groupId>com.whaleal</groupId>
+  <artifactId>sms-all</artifactId>
+  <version>1.0.0</version>
 </dependency>
 ```
 
 或按需：`sms-spring-boot-starter` + `sms-providers-cn` / `sms-providers-intl`。
+
+> 推送分支 `release-x.y.z` 会自动发布到 Maven Central。查版本：[Central Search](https://central.sonatype.com) · 发布说明见 [CI / CD](docs/ci-cd.md)。
+
+#### 本地开发：源码 `mvn install`
+
+```bash
+git clone https://github.com/whaleal-dev/quick-sms.git
+cd quick-sms
+mvn clean install -DskipTests
+```
+
+业务项目直接依赖 `com.whaleal:sms-all:1.0.0`（与根 pom 版本一致）即可。需 **JDK 21**。
 
 ### 纯 Java（无需 yml）
 
@@ -157,7 +180,8 @@ quick-sms/
 ├── sms-providers-intl      # 国际厂商
 ├── sms-spring-boot-starter # 自动配置（不带厂商）
 ├── sms-all                 # starter + cn + intl
-├── docs/                   # 文档站
+├── docs-site/              # Docusaurus 文档站（GitHub Pages）
+├── docs/                   # Markdown 速查（与文档站内容互补）
 └── examples/               # 示例代码
 ```
 
@@ -172,6 +196,8 @@ quick-sms/
 
 ## 文档导航
 
+公开站点：[https://whaleal.com/quick-sms/](https://whaleal.com/quick-sms/)（出站 / 入站 / Report / Webhook 等概念见「短信概念」）。
+
 | 文档 | 内容 |
 |------|------|
 | [前言](docs/intro.md) | 设计理念与适用场景 |
@@ -180,7 +206,8 @@ quick-sms/
 | [进阶配置](docs/features.md) | Failover、限流、安全、指标、代理 |
 | [API 详解](docs/api.md) | 核心类型与错误码 |
 | [厂商接入](docs/providers.md) | 各厂商凭证与回调 |
-| [CI / CD](docs/ci-cd.md) | 自动构建与发布到 GitHub Packages |
+| [CI / CD](docs/ci-cd.md) | 自动构建与发布到 Maven Central |
+| [文档站维护](docs-site/README.md) | 本地预览与 Pages 发布 |
 | [示例](examples/README.md) | 可复制代码 |
 | [变更记录](CHANGELOG.md) | 版本说明 |
 
@@ -212,22 +239,22 @@ Java 21 · Spring Boot 3.4.x
 
 ## 仓库与发布
 
-**源码仓库：** [github.com/whaleal-dev/quick-sms](https://github.com/whaleal-dev/quick-sms)  
-**包仓库：** GitHub Packages（**不是** Maven Central）
+**源码仓库：** [github.com/whaleal-dev/quick-sms](https://github.com/whaleal-dev/quick-sms)
 
 完整流程见 **[CI / CD 说明](docs/ci-cd.md)**。
 
 | 场景 | 触发 | Workflow | Secrets |
 |------|------|----------|---------|
-| 构建测试 | PR / push `main`、**`release-*`** | [ci.yml](.github/workflows/ci.yml) | 无 |
-| **发布 Package** | 分支 **`release-*`** | [publish-github-packages.yml](.github/workflows/publish-github-packages.yml) | **无**（用 `GITHUB_TOKEN`） |
+| 构建测试 | PR / push `main`、`release-*` | [ci.yml](.github/workflows/ci.yml) | 无 |
+| **发布 Maven Central** | 分支 **`release-*`** | [publish-maven-central.yml](.github/workflows/publish-maven-central.yml) | 见下 |
 
 ```bash
-git checkout -b release-1.0.1 && git push -u origin release-1.0.1
+git checkout -b release-1.0.0 && git push -u origin release-1.0.0
 ```
 
-包地址：`https://maven.pkg.github.com/whaleal-dev/quick-sms`  
-Packages 页：[github.com/whaleal-dev/quick-sms/packages](https://github.com/whaleal-dev/quick-sms/packages)
+需配置 Secrets：`MAVEN_CENTRAL_USERNAME`、`MAVEN_CENTRAL_PASSWORD`、`MAVEN_GPG_PRIVATE_KEY`、`MAVEN_GPG_PASSPHRASE`。命名空间须为 **`com.whaleal`**。
+
+消费方引入方式见 **[Maven 引入依赖](#maven-引入依赖)**。
 
 ---
 

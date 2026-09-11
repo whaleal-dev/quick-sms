@@ -170,7 +170,7 @@ public SmsClient smsClient() {
 }
 ```
 
-更多见 [进阶能力](features.md)。
+更多见 [进阶能力](../guide/features.md)。
 
 ## 常见问题
 
@@ -178,6 +178,6 @@ public SmsClient smsClient() {
 |------|------|
 | 找不到厂商实现 | 是否引入了 `sms-providers-cn` / `intl`？starter 本身不含厂商 |
 | E002 缺少凭证 | 非 MOCK 必须传 `credentials` |
-| 回执解析为空 | 确认 payload 字段与厂商文档一致；见 [providers.md](providers.md) |
+| 回执解析为空 | 确认 payload 字段与厂商文档一致；见 [厂商说明](../guide/providers.md) |
 
-下一篇：[JavaSE 快速开始](quickstart-javase.md) · [厂商接入](providers.md)
+下一篇：[JavaSE 快速开始](./quickstart-java.md) · [厂商接入](../guide/providers.md)

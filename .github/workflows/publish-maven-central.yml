@@ -1,12 +1,17 @@
-# 自动发布到本仓库 GitHub Packages
-# https://github.com/whaleal-dev/quick-sms/packages
+# 发布到 Maven Central（Sonatype Central Portal）
 #
 # 触发：
-#   - push 分支：release-1.0.1 / release-v1.0.1
-#   - 手动 workflow_dispatch（可填 version）
+#   - push 分支：release-1.0.0 / release-v1.0.0
+#   - 手动 workflow_dispatch
 #
-# 流程：从分支名解析版本 → 测试 → deploy Packages → 创建 GitHub Release
-name: Publish GitHub Packages
+# 仓库 Secrets（Settings → Secrets and variables → Actions）：
+#   MAVEN_CENTRAL_USERNAME  — Central Portal User Token 用户名
+#   MAVEN_CENTRAL_PASSWORD  — Central Portal User Token 密码
+#   MAVEN_GPG_PRIVATE_KEY   — ASCII armored GPG 私钥
+#   MAVEN_GPG_PASSPHRASE    — GPG 私钥口令
+#
+# 一次性准备见 docs/ci-cd.md
+name: Publish Maven Central
 
 on:
   push:
@@ -15,7 +20,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: '发布版本，如 1.0.1（留空则从 release-* 分支名解析）'
+        description: '覆盖版本号（留空则从分支名解析，如 release-1.0.0）'
         required: false
         type: string
       skip_tests:
@@ -25,18 +30,17 @@ on:
         default: false
 
 concurrency:
-  group: github-packages-${{ github.ref }}
+  group: maven-central-${{ github.ref }}
   cancel-in-progress: false
 
 permissions:
-  contents: write
-  packages: write
+  contents: read
 
 jobs:
   publish:
-    name: Test & Deploy Packages
+    name: Test & Deploy Maven Central
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 90
 
     steps:
       - name: Checkout
@@ -50,8 +54,8 @@ jobs:
           if [ -n "${INPUT_VERSION}" ]; then
             VERSION="${INPUT_VERSION#v}"
           else
-            # release-1.0.1 / release-v1.0.1 → 1.0.1
             REF_NAME="${GITHUB_REF_NAME}"
+            # release-1.0.0 / release-v1.0.0 → 1.0.0
             VERSION="${REF_NAME#release-}"
             VERSION="${VERSION#v}"
           fi
@@ -60,11 +64,10 @@ jobs:
             exit 1
           fi
           if [[ "${VERSION}" == *-SNAPSHOT ]]; then
-            echo "::error::正式发布不允许 SNAPSHOT: ${VERSION}"
+            echo "::error::Maven Central 正式发布不允许 SNAPSHOT: ${VERSION}"
             exit 1
           fi
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
-          echo "tag=v${VERSION}" >> "$GITHUB_OUTPUT"
           echo "Publishing version: ${VERSION}"
 
       - name: Set up JDK 21
@@ -73,9 +76,11 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-          server-id: github
-          server-username: GITHUB_ACTOR
-          server-password: GITHUB_TOKEN
+          server-id: central
+          server-username: MAVEN_CENTRAL_USERNAME
+          server-password: MAVEN_CENTRAL_PASSWORD
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
       - name: Set project version
         run: |
@@ -88,30 +93,9 @@ jobs:
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.skip_tests != 'true' }}
         run: mvn -B -ntp clean verify
 
-      - name: Deploy to GitHub Packages
-        run: mvn -B -ntp -DskipTests deploy
+      - name: Deploy to Maven Central
+        run: mvn -B -ntp -DskipTests -Pcentral clean deploy
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.ver.outputs.tag }}
-          name: Quick SMS ${{ steps.ver.outputs.version }}
-          generate_release_notes: true
-          body: |
-            ## Maven（GitHub Packages）
-
-            ```xml
-            <dependency>
-              <groupId>com.whaleal</groupId>
-              <artifactId>sms-all</artifactId>
-              <version>${{ steps.ver.outputs.version }}</version>
-            </dependency>
-            ```
-
-            仓库：`https://maven.pkg.github.com/whaleal-dev/quick-sms`
-
-            Packages：https://github.com/whaleal-dev/quick-sms/packages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}

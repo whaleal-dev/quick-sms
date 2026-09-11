@@ -10,8 +10,8 @@
 
 | Workflow | 监听 | 作用 |
 |----------|------|------|
-| [ci.yml](../.github/workflows/ci.yml) | `main`、`release-*` | 编译测试 |
-| [publish-maven-central.yml](../.github/workflows/publish-maven-central.yml) | **`release-*`** | 发 **Maven Central** |
+| [ci.yml](https://github.com/whaleal-dev/quick-sms/blob/main/.github/workflows/ci.yml) | `main`、`release-*` | 编译测试 |
+| [publish-maven-central.yml](https://github.com/whaleal-dev/quick-sms/blob/main/.github/workflows/publish-maven-central.yml) | **`release-*`** | 发 **Maven Central** |
 
 > 推送 **`release-x.y.z`** 触发 Maven Central 发布。
 
@@ -139,4 +139,4 @@ mvn -B -DskipTests -Pcentral clean deploy
 
 无需 `<repositories>`、无需 `settings.xml`。本地开发也可用源码 `mvn install`。
 
-返回：[文档首页](README.md) · [README 引入说明](../README.md#maven-引入依赖)
+返回：[文档前言](../intro.md) · [仓库 README](https://github.com/whaleal-dev/quick-sms#readme)
