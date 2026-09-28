@@ -110,7 +110,7 @@ Quick SMS 的目标是：
 <dependency>
   <groupId>com.whaleal</groupId>
   <artifactId>sms-all</artifactId>
-  <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 
@@ -126,7 +126,7 @@ cd quick-sms
 mvn clean install -DskipTests
 ```
 
-业务项目直接依赖 `com.whaleal:sms-all:1.0.0`（与根 pom 版本一致）即可。需 **JDK 21**。
+业务项目直接依赖 `com.whaleal:sms-all:1.0.1`（与根 pom 版本一致）即可。需 **JDK 21**。
 
 ### 纯 Java（无需 yml）
 
