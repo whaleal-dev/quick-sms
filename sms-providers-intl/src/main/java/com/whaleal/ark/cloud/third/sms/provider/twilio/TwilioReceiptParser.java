@@ -1,6 +1,7 @@
 package com.whaleal.ark.cloud.third.sms.provider.twilio;
 
 import com.whaleal.ark.cloud.third.sms.config.SmsProviderConfig;
+import com.whaleal.ark.cloud.third.sms.enums.SmsProviderType;
 import com.whaleal.ark.cloud.third.sms.receipt.entity.SmsReceipt;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ public class TwilioReceiptParser implements ReceiptParser {
                 .to(getString(rawData, "To"))
                 .receiptStatus(parseStatus(getString(rawData, "MessageStatus")))
                 .receiptCode(getString(rawData, "MessageStatus"))
+                .providerType(SmsProviderType.TWILIO)
                 .receivedTime(LocalDateTime.now())
                 .rawData(rawData)
                 .build();

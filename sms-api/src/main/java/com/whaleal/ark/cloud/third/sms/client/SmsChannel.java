@@ -30,6 +30,24 @@ public class SmsChannel {
     /** 可选展示名 */
     private String name;
 
+    /**
+     * 该通道绑定的发送方号码/签名（可选）。
+     * sender 与厂商账号天然绑定：多 sender 展开为多条同厂商通道时各自携带，
+     * 解析顺序 request.from（调用方显式）→ channel.from（通道绑定）→ fromByProvider。
+     *
+     * @since 1.2.0
+     */
+    private String from;
+
+    /**
+     * 负载均衡权重（≥1，默认 1）。
+     * 平滑加权轮询按此比例分发；加权随机按此概率抽取；顺序策略忽略此字段。
+     *
+     * @since 1.1.0
+     */
+    @Builder.Default
+    private int weight = 1;
+
     public static SmsChannel of(SmsProviderType provider, SmsCredentials credentials) {
         return SmsChannel.builder()
                 .provider(provider)

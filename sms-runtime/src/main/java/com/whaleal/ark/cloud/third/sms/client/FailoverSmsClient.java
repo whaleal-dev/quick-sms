@@ -84,10 +84,18 @@ public class FailoverSmsClient implements SmsClient {
                     request.getTemplateIdByProvider(), channelKey, request.getTemplateId());
             var templateParams = DefaultSmsClient.resolveParamsByProvider(
                     request.getTemplateParamsByProvider(), channelKey, request.getTemplateParams());
+            // 发送方解析：调用方显式 from 优先 → 通道绑定 sender（多 sender 展开为多通道）→ fromByProvider
+            String from = (request.getFrom() != null && !request.getFrom().isBlank())
+                    ? request.getFrom()
+                    : (channel.getFrom() != null && !channel.getFrom().isBlank())
+                            ? channel.getFrom()
+                            : DefaultSmsClient.resolveByProvider(
+                                    request.getFromByProvider(), channelKey, null);
             SmsSendRequest attempt = SmsSendRequest.builder()
                     .to(request.getTo())
                     .content(content)
-                    .from(request.getFrom())
+                    .from(from)
+                    .fromByProvider(request.getFromByProvider())
                     .templateId(templateId)
                     .templateParams(templateParams)
                     .contentByProvider(request.getContentByProvider())

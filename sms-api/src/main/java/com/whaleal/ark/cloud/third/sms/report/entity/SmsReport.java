@@ -130,6 +130,7 @@ public class SmsReport {
         SUBMITTED("submitted", "已提交"),
         ACCEPTED("accepted", "已接受"),
         QUEUED("queued", "排队中"),
+        PENDING("pending", "处理中"),
         SENT("sent", "已发送"),
         DELIVERED("delivered", "已送达"),
         FAILED("failed", "发送失败"),

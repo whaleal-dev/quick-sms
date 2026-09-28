@@ -1,57 +1,82 @@
 package com.whaleal.ark.cloud.third.sms.provider.infobip;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.whaleal.ark.cloud.third.sms.config.SmsProviderConfig;
+import com.whaleal.ark.cloud.third.sms.enums.SmsProviderType;
+import com.whaleal.ark.cloud.third.sms.error.ProviderErrorMapper;
 import com.whaleal.ark.cloud.third.sms.outbound.entity.SmsOutboundMessage;
+import com.whaleal.ark.cloud.third.sms.outbound.sender.OutboundSender;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.whaleal.ark.cloud.third.sms.outbound.sender.OutboundSender;
-
 /**
- * Infobip短信发送器
- * 
+ * Infobip 下行发送器。
+ *
+ * <p>默认使用最新 <b>SMS API V3</b>（{@code POST {baseUrl}/sms/3/messages}，
+ * 2026 起官方文档将 V2 {@code /sms/2/text/advanced} 标记为 superseded）：</p>
+ * <pre>
+ * {
+ *   "messages": [{
+ *     "sender": "InfoSMS",
+ *     "destinations": [{"to": "41793026727"}],
+ *     "content": {"text": "..."},
+ *     "webhooks": {"delivery": {"url": "..."}, "contentType": "application/json"}
+ *   }]
+ * }
+ * </pre>
+ * <p>认证：API key（推荐）用 {@code Authorization: App &lt;apiKey&gt;}；
+ * 账号密码式（apiSecret 非空）回退 {@code Basic apiKey:apiSecret}。</p>
+ * <p>V2 可通过 {@code config.config["apiVersion"]="v2"} 回退（存量账号兜底）。</p>
+ *
+ * @author whaleal-dev
+ * @since 1.0.0
+ * @see <a href="https://www.infobip.com/docs/api/channels/sms/send-sms-message">Infobip Send SMS message (V3)</a>
  */
 @Slf4j
 public class InfobipOutboundSender implements OutboundSender {
 
-    private static final int TIMEOUT_MS = 10000; // 10秒超时
+    private static final String DEFAULT_ENDPOINT = "https://api.infobip.com";
+    private static final long DEFAULT_TIMEOUT_MS = 30_000L;
+
+    private final HttpClient httpClient;
+
+    public InfobipOutboundSender() {
+        this.httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(30))
+                .build();
+    }
 
     @Override
     public SmsOutboundMessage sendMessage(SmsOutboundMessage message, SmsProviderConfig config) {
         try {
-            log.info("开始发送Infobip短信 - 接收方: {}", message.getTo());
-            
-            // 参数验证
-            validateConfig(config);
-            validateMessage(message);
-            
-            // 更新消息状态为发送中
-            message.setSendStatus(SmsOutboundMessage.SendStatus.SUBMITTED);
-            message.setSentTime(LocalDateTime.now());
-            
-            // 构建请求
-            String requestBody = buildRequestBody(message, config);
-            
-            // 发送HTTP请求
-            String response = sendHttpRequest(requestBody, config);
-            
-            // 解析响应
-            return parseResponse(response, message);
-            
+            log.info("Infobip发送短信 - 接收方: {}, apiVersion={}", message.getTo(), apiVersion(config));
+
+            if (isBlank(config.getApiKey())) {
+                return failMapped(message, "E002", "Infobip apiKey 不能为空");
+            }
+            if (isBlank(message.getTo()) || isBlank(message.getContent())) {
+                return failMapped(message, "E001", "to/content 不能为空");
+            }
+
+            String body = "v2".equals(apiVersion(config))
+                    ? buildV2RequestBody(message, config)
+                    : buildV3RequestBody(message, config);
+            HttpResponse<String> response = sendHttpRequest(body, config);
+            return parseResponse(message, response, config);
         } catch (Exception e) {
-            log.error("Infobip短信发送失败 - 接收方: {}, 错误: {}", 
-                    message.getTo(), e.getMessage(), e);
-            
+            log.error("Infobip短信发送失败 - 接收方: {}, 错误: {}", message.getTo(), e.getMessage(), e);
             return createFailedMessage(message, e.getMessage());
         }
     }
@@ -61,311 +86,190 @@ public class InfobipOutboundSender implements OutboundSender {
         return "INFOBIP";
     }
 
-    /**
-     * 验证配置参数
-     */
-    private void validateConfig(SmsProviderConfig config) {
-        if (config.getApiKey() == null || config.getApiKey().trim().isEmpty()) {
-            throw new IllegalArgumentException("Infobip API Key不能为空");
-        }
+    static String apiVersion(SmsProviderConfig config) {
+        String v = config.getStringConfig("apiVersion", "v3");
+        return "v2".equalsIgnoreCase(v) ? "v2" : "v3";
     }
 
-    /**
-     * 验证消息参数
-     */
-    private void validateMessage(SmsOutboundMessage message) {
-        if (message.getTo() == null || message.getTo().trim().isEmpty()) {
-            throw new IllegalArgumentException("接收号码不能为空");
+    // ---------- 请求构建 ----------
+
+    /** V3：sender + destinations[] + content.text + webhooks.delivery.url */
+    private String buildV3RequestBody(SmsOutboundMessage message, SmsProviderConfig config) {
+        JSONObject content = new JSONObject();
+        content.put("text", message.getContent());
+
+        JSONObject msg = new JSONObject();
+        msg.put("sender", firstNonBlank(message.getFrom(), config.getSignName(),
+                config.getDefaultFrom(), "Infobip"));
+        msg.put("destinations", JSONArray.of(new JSONObject().fluentPut("to", message.getTo().trim())));
+        msg.put("content", content);
+
+        String webhook = resolveWebhook(message, config);
+        if (!isBlank(webhook)) {
+            JSONObject delivery = new JSONObject();
+            delivery.put("url", webhook);
+            JSONObject webhooks = new JSONObject();
+            webhooks.put("delivery", delivery);
+            webhooks.put("contentType", "application/json");
+            msg.put("webhooks", webhooks);
         }
-        if (message.getContent() == null || message.getContent().trim().isEmpty()) {
-            throw new IllegalArgumentException("短信内容不能为空");
-        }
+
+        JSONObject root = new JSONObject();
+        root.put("messages", JSONArray.of(msg));
+        return root.toJSONString();
     }
 
-    /**
-     * 构建请求体
-     */
-    private String buildRequestBody(SmsOutboundMessage message, SmsProviderConfig config) {
-        Map<String, Object> requestData = new HashMap<>();
-        
-        // 构建消息数组
-        Map<String, Object> messageData = new HashMap<>();
-        messageData.put("from", getFromNumber(message, config));
-        messageData.put("to", message.getTo());
-        messageData.put("text", message.getContent());
-        
-        // 添加编码/音译参数
-        // Infobip自动检测编码，但可通过transliteration控制字符转换
-        String encoding = message.getEncoding();
-        if (encoding != null) {
-            // 如果明确指定为text/gsm7，使用音译将Unicode字符转为GSM-7
-            if ("text".equalsIgnoreCase(encoding) || "gsm7".equalsIgnoreCase(encoding)) {
-                messageData.put("transliteration", "NON_UNICODE");
-            }
-            // unicode编码不需要特殊处理，Infobip会自动处理
+    /** V2（legacy 兜底）：from + to + text + notifyUrl */
+    private String buildV2RequestBody(SmsOutboundMessage message, SmsProviderConfig config) {
+        JSONObject msg = new JSONObject();
+        msg.put("from", firstNonBlank(message.getFrom(), config.getSignName(),
+                config.getDefaultFrom(), "Infobip"));
+        msg.put("to", message.getTo().trim());
+        msg.put("text", message.getContent());
+        String webhook = resolveWebhook(message, config);
+        if (!isBlank(webhook)) {
+            msg.put("notifyUrl", webhook);
         }
-        
-        // 可选参数
-        if (message.getSendConfig() != null) {
-            // 状态报告URL
-            if (message.getSendConfig().getCallbackUrl() != null) {
-                messageData.put("notifyUrl", message.getSendConfig().getCallbackUrl());
-            }
-            
-            // 有效期设置 (Infobip使用分钟)
-            if (message.getSendConfig().getValidityPeriod() != null) {
-                messageData.put("validityPeriod", message.getSendConfig().getValidityPeriod());
-            }
-            
-            // 消息ID
-            if (message.getMessageId() != null) {
-                messageData.put("messageId", message.getMessageId());
-            }
-        }
-        
-        requestData.put("messages", new Object[]{messageData});
-        
-        return formatToJson(requestData);
+
+        JSONObject root = new JSONObject();
+        root.put("messages", JSONArray.of(msg));
+        return root.toJSONString();
     }
 
-    /**
-     * 获取发送方号码
-     * 对于国际短信提供商，优先级：signName(品牌名) > message.getFrom() > config.getDefaultFrom() > 默认值
-     */
-    private String getFromNumber(SmsOutboundMessage message, SmsProviderConfig config) {
-        // 1. 优先使用配置的签名作为品牌发送方（国际短信常用）
-        if (config.getSignName() != null && !config.getSignName().trim().isEmpty()) {
-            return config.getSignName();
-        }
-        // 2. 使用消息指定的发送方号码
-        else if (message.getFrom() != null && !message.getFrom().trim().isEmpty()) {
-            return message.getFrom();
-        }
-        // 3. 使用配置的默认发送方号码
-        else if (config.getDefaultFrom() != null && !config.getDefaultFrom().trim().isEmpty()) {
-            return config.getDefaultFrom();
-        }
-        // 4. 最后使用提供商名称作为默认值
-        else {
-            return "Infobip";
-        }
-    }
+    // ---------- HTTP ----------
 
-    /**
-     * 格式化为JSON字符串
-     */
-    private String formatToJson(Map<String, Object> data) {
-        StringBuilder sb = new StringBuilder("{");
-        boolean first = true;
-        
-        for (Map.Entry<String, Object> entry : data.entrySet()) {
-            if (!first) sb.append(",");
-            
-            sb.append("\"").append(entry.getKey()).append("\":");
-            
-            Object value = entry.getValue();
-            if (value instanceof String) {
-                sb.append("\"").append(value).append("\"");
-            } else if (value instanceof Number) {
-                sb.append(value);
-            } else if (value instanceof Object[]) {
-                Object[] array = (Object[]) value;
-                sb.append("[");
-                for (int i = 0; i < array.length; i++) {
-                    if (i > 0) sb.append(",");
-                    if (array[i] instanceof Map) {
-                        @SuppressWarnings("unchecked")
-                        Map<String, Object> mapItem = (Map<String, Object>) array[i];
-                        sb.append(formatToJson(mapItem));
-                    } else {
-                        sb.append("\"").append(array[i]).append("\"");
-                    }
-                }
-                sb.append("]");
-            } else {
-                sb.append("\"").append(value.toString()).append("\"");
-            }
-            
-            first = false;
-        }
-        
-        sb.append("}");
-        return sb.toString();
-    }
+    private HttpResponse<String> sendHttpRequest(String requestBody, SmsProviderConfig config) throws Exception {
+        String base = firstNonBlank(config.getOutboundBaseUrl(), DEFAULT_ENDPOINT);
+        String url = stripEndingSlash(base) + ("/v2".equals(apiVersion(config))
+                ? "/sms/2/text/advanced" : "/sms/3/messages");
 
-    /**
-     * 发送HTTP请求
-     */
-    private String sendHttpRequest(String requestBody, SmsProviderConfig config) throws Exception {
-        String apiUrl = config.getOutboundBaseUrl() != null ?
-            config.getOutboundBaseUrl() + "/sms/2/text/advanced" : "https://api.infobip.com/sms/2/text/advanced";
-        
-        URL url = new URL(apiUrl);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        
-        try {
-            // 设置请求属性
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("Accept", "application/json");
-            
-            // Infobip使用基本认证
-            String auth = config.getApiKey() + ":" + (config.getApiSecret() != null ? config.getApiSecret() : "");
-            String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
-            connection.setRequestProperty("Authorization", "Basic " + encodedAuth);
-            
-            connection.setRequestProperty("User-Agent", "SMS-SDK/1.0");
-            connection.setConnectTimeout(TIMEOUT_MS);
-            connection.setReadTimeout(TIMEOUT_MS);
-            connection.setDoOutput(true);
-            
-            // 发送请求体
-            try (OutputStream os = connection.getOutputStream()) {
-                os.write(requestBody.getBytes(StandardCharsets.UTF_8));
-                os.flush();
-            }
-            
-            // 读取响应
-            int responseCode = connection.getResponseCode();
-            StringBuilder response = new StringBuilder();
-            
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    responseCode == 200 ? connection.getInputStream() : connection.getErrorStream(),
-                    StandardCharsets.UTF_8))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
-                }
-            }
-            
-            if (responseCode != 200) {
-                throw new RuntimeException("HTTP请求失败，状态码: " + responseCode + ", 响应: " + response.toString());
-            }
-            
-            return response.toString();
-            
-        } finally {
-            connection.disconnect();
-        }
-    }
+        HttpRequest.Builder req = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .timeout(Duration.ofMillis(timeoutMs(config)))
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .header("User-Agent", "SMS-SDK/1.0")
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8));
 
-    /**
-     * 解析响应结果
-     */
-    private SmsOutboundMessage parseResponse(String response, SmsOutboundMessage message) {
-        try {
-            log.debug("Infobip API响应: {}", response);
-            
-            // 检查是否包含错误
-            if (response.contains("\"requestError\"")) {
-                message.setSendStatus(SmsOutboundMessage.SendStatus.FAILED);
-                String errorMessage = extractJsonValue(response, "text");
-                if (errorMessage == null) {
-                    errorMessage = "Infobip API返回错误";
-                }
-                
-                if (message.getExtraInfo() == null) {
-                    message.setExtraInfo(new HashMap<>());
-                }
-                message.getExtraInfo().put("error", errorMessage);
-                
-                return message;
-            }
-            
-            // 成功情况 - 检查messages数组
-            if (response.contains("\"messages\":[")) {
-                // 提取第一个消息的状态
-                String messageId = extractJsonValue(response, "messageId");
-                String status = extractJsonValue(response, "groupName");
-                
-                if (messageId != null) {
-                    message.setProviderMessageId(messageId);
-                }
-                
-                // 根据状态设置发送结果
-                if ("PENDING".equals(status) || "ACCEPTED".equals(status)) {
-                    message.setSendStatus(SmsOutboundMessage.SendStatus.SENT);
-                    message.setEstimatedDeliveryTime(LocalDateTime.now().plusMinutes(2));
-                } else if ("REJECTED".equals(status)) {
-                    message.setSendStatus(SmsOutboundMessage.SendStatus.FAILED);
-                    String errorDescription = extractJsonValue(response, "description");
-                    if (message.getExtraInfo() == null) {
-                        message.setExtraInfo(new HashMap<>());
-                    }
-                    message.getExtraInfo().put("error", errorDescription != null ? errorDescription : "消息被拒绝");
-                } else {
-                    message.setSendStatus(SmsOutboundMessage.SendStatus.SENT);
-                    message.setEstimatedDeliveryTime(LocalDateTime.now().plusMinutes(2));
-                }
-                
-                // 提取费用信息
-                String messagePrice = extractJsonValue(response, "pricePerMessage");
-                String currency = extractJsonValue(response, "currency");
-                if (messagePrice != null && currency != null) {
-                    message.setCostInfo(SmsOutboundMessage.CostInfo.builder()
-                            .amount(messagePrice)
-                            .currency(currency)
-                            .billingType("per_message")
-                            .messageCount(1)
-                            .unitPrice(messagePrice)
-                            .billingTime(LocalDateTime.now())
-                            .build());
-                }
-                
-            } else {
-                message.setSendStatus(SmsOutboundMessage.SendStatus.FAILED);
-                if (message.getExtraInfo() == null) {
-                    message.setExtraInfo(new HashMap<>());
-                }
-                message.getExtraInfo().put("error", "未知的响应格式");
-            }
-            
-            // 保存原始响应
-            if (message.getRawData() == null) {
-                message.setRawData(new HashMap<>());
-            }
-            message.getRawData().put("infobip_response", response);
-            
-            return message;
-            
-        } catch (Exception e) {
-            log.error("Infobip响应解析失败: {}", e.getMessage(), e);
-            return createFailedMessage(message, "响应解析失败: " + e.getMessage());
-        }
-    }
-
-
-
-    /**
-     * 从JSON字符串中提取值（简单实现）
-     */
-    private String extractJsonValue(String json, String key) {
-        String searchKey = "\"" + key + "\":\"";
-        int startIndex = json.indexOf(searchKey);
-        if (startIndex == -1) {
-            // 尝试数字值
-            searchKey = "\"" + key + "\":";
-            startIndex = json.indexOf(searchKey);
-            if (startIndex == -1) return null;
-            
-            startIndex += searchKey.length();
-            int endIndex = json.indexOf(",", startIndex);
-            if (endIndex == -1) {
-                endIndex = json.indexOf("}", startIndex);
-            }
-            
-            if (endIndex > startIndex) {
-                return json.substring(startIndex, endIndex).replace("\"", "").trim();
-            }
+        // 认证：apiSecret 非空 = 账号密码式 Basic；否则 API key 走官方推荐的 App scheme
+        if (!isBlank(config.getApiSecret())) {
+            String auth = config.getApiKey() + ":" + config.getApiSecret();
+            req.header("Authorization", "Basic " + Base64.getEncoder()
+                    .encodeToString(auth.getBytes(StandardCharsets.UTF_8)));
         } else {
-            startIndex += searchKey.length();
-            int endIndex = json.indexOf("\"", startIndex);
-            
-            if (endIndex > startIndex) {
-                return json.substring(startIndex, endIndex);
+            req.header("Authorization", "App " + config.getApiKey().trim());
+        }
+
+        log.debug("Infobip API请求 - URL: {}, Body: {}", url, requestBody);
+        return httpClient.send(req.build(), HttpResponse.BodyHandlers.ofString());
+    }
+
+    // ---------- 响应解析 ----------
+
+    private SmsOutboundMessage parseResponse(SmsOutboundMessage message, HttpResponse<String> response,
+                                             SmsProviderConfig config) {
+        int code = response.statusCode();
+        String body = response.body() == null ? "" : response.body();
+        log.debug("Infobip API响应 - 状态码: {}, 响应体: {}", code, body);
+
+        JSONObject json = body.isBlank() ? new JSONObject() : JSON.parseObject(body);
+        if (message.getExtraInfo() == null) {
+            message.setExtraInfo(new HashMap<>());
+        }
+        message.getExtraInfo().put("httpStatus", code);
+        message.getExtraInfo().put("apiVersion", apiVersion(config));
+        if (message.getRawData() == null) {
+            message.setRawData(new HashMap<>());
+        }
+        message.getRawData().put("infobip_response", body);
+
+        // 非 2xx：requestError（{requestError:{serviceException:{messageId,text}}}
+        // 或 V3 纯错误对象 {messageId, text}）
+        if (code < 200 || code >= 300) {
+            JSONObject serviceException = json.getJSONObject("requestError") == null
+                    ? null : json.getJSONObject("requestError").getJSONObject("serviceException");
+            String errCode = firstNonBlank(
+                    serviceException != null ? serviceException.getString("messageId") : null,
+                    json.getString("messageId"), "HTTP_" + code);
+            String errText = firstNonBlank(
+                    serviceException != null ? serviceException.getString("text") : null,
+                    json.getString("text"), body);
+            return failMapped(message, errCode, errText);
+        }
+
+        JSONArray messages = json.getJSONArray("messages");
+        if (messages == null || messages.isEmpty()) {
+            return failMapped(message, "EMPTY_MESSAGES", "响应缺少 messages 数组: " + body);
+        }
+        JSONObject first = messages.getJSONObject(0);
+        String messageId = first.getString("messageId");
+        JSONObject status = first.getJSONObject("status");
+        String groupName = status != null ? status.getString("groupName") : null;
+        String statusName = status != null ? status.getString("name") : null;
+        String description = status != null ? status.getString("description") : null;
+
+        if (messageId != null && !messageId.isBlank()) {
+            message.setProviderMessageId(messageId);
+        }
+
+        // groupId 5 = REJECTED；PENDING/ACCEPTED/DELIVERED 等均视为已提交，终态以回执为准
+        if ("REJECTED".equalsIgnoreCase(groupName)) {
+            return failMapped(message, statusName != null ? statusName : "REJECTED",
+                    description != null ? description : "消息被拒绝");
+        }
+
+        message.setSendStatus(SmsOutboundMessage.SendStatus.SUBMITTED);
+        message.setSentTime(LocalDateTime.now());
+        message.setProviderType(SmsProviderType.INFOBIP);
+        message.getExtraInfo().put("status", groupName);
+        message.getExtraInfo().put("statusName", statusName);
+        return message;
+    }
+
+    // ---------- 工具 ----------
+
+    private SmsOutboundMessage failMapped(SmsOutboundMessage message, String code, String detail) {
+        message.setSendStatus(SmsOutboundMessage.SendStatus.FAILED);
+        if (message.getExtraInfo() == null) {
+            message.setExtraInfo(new HashMap<>());
+        }
+        ProviderErrorMapper.putMapped(message.getExtraInfo(), "infobip", code, detail);
+        message.setProviderType(SmsProviderType.INFOBIP);
+        return message;
+    }
+
+    private static String resolveWebhook(SmsOutboundMessage message, SmsProviderConfig config) {
+        if (message.getSendConfig() != null && !isBlank(message.getSendConfig().getCallbackUrl())) {
+            return message.getSendConfig().getCallbackUrl();
+        }
+        return firstNonBlank(config.getDeliveryReceiptUrl(), config.getNotifyUrl(),
+                config.getCallbackUrl(), config.getStatusReportUrl());
+    }
+
+    private static String stripEndingSlash(String url) {
+        return url != null && url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
+    }
+
+    private static long timeoutMs(SmsProviderConfig config) {
+        if (config.getRequestTimeout() != null && config.getRequestTimeout() > 0) {
+            return config.getRequestTimeout();
+        }
+        return DEFAULT_TIMEOUT_MS;
+    }
+
+    private static boolean isBlank(String s) {
+        return s == null || s.trim().isEmpty();
+    }
+
+    private static String firstNonBlank(String... vals) {
+        if (vals == null) {
+            return null;
+        }
+        for (String v : vals) {
+            if (!isBlank(v)) {
+                return v.trim();
             }
         }
-        
         return null;
     }
-} 
+}
