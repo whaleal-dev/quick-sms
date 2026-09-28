@@ -191,7 +191,7 @@ public class VonageOutboundSender implements OutboundSender {
                     firstNonBlank(first.getString("error-code"), status),
                     first.getString("error-text"));
         }
-        original.setSendStatus(SmsOutboundMessage.SendStatus.SENT);
+        original.setSendStatus(SmsOutboundMessage.SendStatus.SUBMITTED); // legacy status=0 = 已接受，终态以回执为准
         original.setProviderMessageId(first.getString("message-id"));
         original.setProviderType(SmsProviderType.VONAGE);
         original.setSentTime(LocalDateTime.now());

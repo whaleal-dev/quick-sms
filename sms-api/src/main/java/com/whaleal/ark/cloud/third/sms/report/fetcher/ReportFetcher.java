@@ -33,9 +33,15 @@ import java.util.List;
  * <h3>状态映射规范</h3>
  * <ul>
  *   <li>SUBMITTED: 已提交到运营商</li>
+ *   <li>ACCEPTED: 厂商已接受</li>
+ *   <li>QUEUED: 排队中</li>
+ *   <li>PENDING: 处理中（发送中）</li>
+ *   <li>SENT: 已发送到运营商</li>
  *   <li>DELIVERED: 已成功送达</li>
  *   <li>FAILED: 发送失败</li>
- *   <li>PENDING: 处理中</li>
+ *   <li>EXPIRED: 已过期</li>
+ *   <li>REJECTED: 被拒绝</li>
+ *   <li>UNDELIVERABLE: 无法送达</li>
  *   <li>UNKNOWN: 状态未知或查询失败</li>
  * </ul>
  * 

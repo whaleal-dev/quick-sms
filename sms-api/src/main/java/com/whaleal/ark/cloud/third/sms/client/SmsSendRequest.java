@@ -32,6 +32,15 @@ public class SmsSendRequest {
     /** 发送方号码/签名（可选，未设置时使用全局 defaultFrom） */
     private String from;
 
+    /**
+     * 按通道覆盖发送方号码/签名（key 为 provider code，如 {@code twilio} / {@code vonage}）。
+     * <p>failover 时：显式设置了 {@link #from} 则全局优先（调用方明确指定），
+     * 否则取当前通道对应值——适配「sender 与厂商账号绑定」的场景（各厂商 from 互不通用）。</p>
+     *
+     * @since 1.1.0
+     */
+    private Map<String, String> fromByProvider;
+
     /** 模板 ID（与 content 二选一） */
     private String templateId;
 

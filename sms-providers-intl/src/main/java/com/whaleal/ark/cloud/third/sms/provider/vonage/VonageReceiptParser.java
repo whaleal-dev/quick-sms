@@ -28,8 +28,9 @@ public class VonageReceiptParser implements ReceiptParser {
         String messageId = first(rawData,
                 "message_uuid", "messageId", "message-id", "message_id");
         String to = first(rawData, "to", "msisdn");
-        String status = first(rawData, "status", "message_status");
-        String err = first(rawData, "error", "err-code", "error-code", "detail");
+        // Messages API v1 DR webhook 不带 status，用 type=message.delivered/undeliverable/rejected 表达
+        String status = first(rawData, "status", "message_status", "type");
+        String err = extractError(rawData);
 
         return SmsReceipt.builder()
                 .receiptId(messageId)
@@ -56,6 +57,17 @@ public class VonageReceiptParser implements ReceiptParser {
     private SmsReceipt.ReceiptStatus parseStatus(String status) {
         if (status == null) {
             return SmsReceipt.ReceiptStatus.UNKNOWN;
+        }
+        // Messages API v1：type = message.delivered / message.undeliverable / message.rejected / message.expired
+        if (status.toLowerCase().startsWith("message.")) {
+            return switch (status.toLowerCase().substring("message.".length())) {
+                case "delivered" -> SmsReceipt.ReceiptStatus.DELIVERED;
+                case "undeliverable" -> SmsReceipt.ReceiptStatus.UNDELIVERABLE;
+                case "rejected" -> SmsReceipt.ReceiptStatus.REJECTED;
+                case "expired" -> SmsReceipt.ReceiptStatus.EXPIRED;
+                case "accepted", "submitted" -> SmsReceipt.ReceiptStatus.SENT;
+                default -> SmsReceipt.ReceiptStatus.UNKNOWN;
+            };
         }
         return switch (status.toLowerCase()) {
             case "delivered", "submitted", "accepted" -> SmsReceipt.ReceiptStatus.DELIVERED;
@@ -85,6 +97,23 @@ public class VonageReceiptParser implements ReceiptParser {
             log.warn("解析Vonage时间失败: {}", timestamp);
             return null;
         }
+    }
+
+    /**
+     * 错误信息提取：Messages API v1 error 为对象 {type,title,detail}；
+     * 旧 SMS API DLR 为平铺 err-code / error-code / error-text。
+     */
+    private static String extractError(Map<String, Object> data) {
+        Object error = data.get("error");
+        if (error instanceof Map<?, ?> em) {
+            Object detail = em.get("detail");
+            if (detail != null) {
+                return detail.toString();
+            }
+            Object title = em.get("title");
+            return title != null ? title.toString() : null;
+        }
+        return first(data, "error", "err-code", "error-code", "detail");
     }
 
     private static String first(Map<String, Object> data, String... keys) {
