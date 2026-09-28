@@ -93,7 +93,31 @@ jobs:
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.skip_tests != 'true' }}
         run: mvn -B -ntp clean verify
 
+      # Maven Central 同版本永久不可覆盖。发布前探测 repo1.maven.org：
+      # 全部构件已存在 → 跳过 deploy（避免重推 release-* 分支时挂红）；
+      # 有缺失 → 正常尝试发布（Central bundle 是原子的，部分缺失时仍会失败）。
+      - name: Detect already-published on Central
+        id: detect
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          set -euo pipefail
+          ARTIFACTS="quick-sms sms-all sms-api sms-core sms-providers-cn sms-providers-intl sms-runtime sms-spring-boot-starter"
+          MISSING=0
+          for ART in ${ARTIFACTS}; do
+            URL="https://repo1.maven.org/maven2/com/whaleal/${ART}/${VERSION}/${ART}-${VERSION}.pom"
+            CODE=$(curl -sL -o /dev/null -w '%{http_code}' "${URL}")
+            if [ "${CODE}" = "200" ]; then
+              echo "::notice::${ART}:${VERSION} 已在 Central，跳过"
+            else
+              echo "::notice::${ART}:${VERSION} 不在 Central (HTTP ${CODE})，需发布"
+              MISSING=1
+            fi
+          done
+          echo "need_deploy=${MISSING}" >> "$GITHUB_OUTPUT"
+
       - name: Deploy to Maven Central
+        if: ${{ steps.detect.outputs.need_deploy == '1' }}
         run: mvn -B -ntp -DskipTests -Pcentral clean deploy
         env:
           MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
