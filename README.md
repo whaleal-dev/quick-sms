@@ -8,7 +8,7 @@
 
 多供应商短信聚合 SDK。不必再为每家厂商单独啃文档、写签名与 HTTP 工具；用统一的 `SmsClient` / `SmsWebhookHandler` 完成发信、回执、上行与状态查询。
 
-- 版本：`1.0.0`
+- 版本：`1.0.1`
 - 坐标：`com.whaleal:sms-all`
 - GitHub：[whaleal-dev/quick-sms](https://github.com/whaleal-dev/quick-sms)
 - 官网：[whaleal.com](https://whaleal.com)
@@ -250,7 +250,7 @@ Java 21 · Spring Boot 3.4.x
 | **发布 Maven Central** | 分支 **`release-*`** | [publish-maven-central.yml](.github/workflows/publish-maven-central.yml) | 见下 |
 
 ```bash
-git checkout -b release-1.0.0 && git push -u origin release-1.0.0
+git checkout -b release-1.0.1 && git push -u origin release-1.0.1
 ```
 
 需配置 Secrets：`MAVEN_CENTRAL_USERNAME`、`MAVEN_CENTRAL_PASSWORD`、`MAVEN_GPG_PRIVATE_KEY`、`MAVEN_GPG_PASSPHRASE`。命名空间须为 **`com.whaleal`**。
