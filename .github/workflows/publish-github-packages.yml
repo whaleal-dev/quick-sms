@@ -107,7 +107,8 @@ jobs:
           SKIP=""
           for ART in ${ARTIFACTS}; do
             URL="${BASE_URL}/${ART}/${VERSION}/${ART}-${VERSION}.pom"
-            CODE=$(curl -s -o /dev/null -w '%{http_code}' \
+            # -L 跟随重定向：GitHub Packages 构件 URL 会先 302，不跟随会误判
+            CODE=$(curl -sL -o /dev/null -w '%{http_code}' \
               -H "Authorization: Bearer ${GITHUB_TOKEN}" "${URL}")
             if [ "${CODE}" = "200" ]; then
               echo "::notice::${ART}:${VERSION} 已发布，跳过"
