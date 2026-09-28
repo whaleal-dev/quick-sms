@@ -5,7 +5,7 @@
 #   - push 分支：release-1.0.1 / release-v1.0.1
 #   - 手动 workflow_dispatch（可填 version）
 #
-# 流程：从分支名解析版本 → 测试 → deploy Packages → 创建 GitHub Release
+# 流程：从分支名解析版本 → 测试 → deploy Packages（已发布的版本自动跳过，只补发缺失模块）→ 创建 GitHub Release
 name: Publish GitHub Packages
 
 on:
@@ -88,8 +88,44 @@ jobs:
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.skip_tests != 'true' }}
         run: mvn -B -ntp clean verify
 
-      - name: Deploy to GitHub Packages
-        run: mvn -B -ntp -DskipTests deploy
+      - name: Install all modules locally
+        run: mvn -B -ntp -DskipTests install
+
+      # GitHub Packages 同版本不可覆盖发布（重复 deploy 会 409）。
+      # 策略：逐模块探测该版本是否已存在（GET pom 返回 200 视为已发布），
+      # 跳过已发布的，只 deploy 缺失的模块；全部已存在则整体跳过。
+      - name: Detect already-published artifacts
+        id: detect
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          set -euo pipefail
+          BASE_URL="https://maven.pkg.github.com/whaleal-dev/quick-sms/com/whaleal"
+          ARTIFACTS="quick-sms sms-all sms-api sms-core sms-providers-cn sms-providers-intl sms-runtime sms-spring-boot-starter"
+          DEPLOY=""
+          SKIP=""
+          for ART in ${ARTIFACTS}; do
+            URL="${BASE_URL}/${ART}/${VERSION}/${ART}-${VERSION}.pom"
+            CODE=$(curl -s -o /dev/null -w '%{http_code}' \
+              -H "Authorization: Bearer ${GITHUB_TOKEN}" "${URL}")
+            if [ "${CODE}" = "200" ]; then
+              echo "::notice::${ART}:${VERSION} 已发布，跳过"
+              SKIP="${SKIP} ${ART}"
+            else
+              echo "::notice::${ART}:${VERSION} 未发布，待部署 (HTTP ${CODE})"
+              DEPLOY="${DEPLOY},:${ART}"
+            fi
+          done
+          DEPLOY="${DEPLOY#,}"
+          echo "deploy_modules=${DEPLOY}" >> "$GITHUB_OUTPUT"
+          if [ -n "${SKIP}" ]; then
+            echo "Skipped (already published):${SKIP}"
+          fi
+
+      - name: Deploy to GitHub Packages (only missing)
+        if: ${{ steps.detect.outputs.deploy_modules != '' }}
+        run: mvn -B -ntp -DskipTests deploy -pl ${{ steps.detect.outputs.deploy_modules }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
