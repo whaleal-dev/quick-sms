@@ -21,6 +21,7 @@ public class SmsSendResult {
     private String providerMessageId;
     private SmsOutboundMessage.SendStatus status;
     private SmsProviderType provider;
+    private String from;
     private String to;
     private String errorCode;
     private String errorMessage;
@@ -34,6 +35,9 @@ public class SmsSendResult {
                 .providerMessageId(message.getProviderMessageId())
                 .status(message.getSendStatus())
                 .provider(message.getProviderType())
+                // 实际使用的发送方：调用方未指定时由 FailoverSmsClient 注入渠道绑定的
+                // sender——调用方无从知晓，必须随结果带回，否则平台日志记录不了真实发信号码
+                .from(message.getFrom())
                 .to(message.getTo())
                 .build();
     }
