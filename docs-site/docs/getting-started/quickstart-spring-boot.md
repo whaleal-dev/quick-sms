@@ -2,6 +2,8 @@
 
 按 Quick SMS 的「无强制 yml」约定，介绍 Spring Boot 下的依赖、Bean 与发信步骤。
 
+> 💡 **还没决定自己维护通道还是用托管平台？** 如果你想少写运维代码（多渠道分发、容灾、日志、密钥轮换都在控制台完成），先看[官方托管平台 Whaleal SMS](../platform/overview.md) —— 它同样用你自己的 CPaaS 账号，五步就能发出第一条短信。
+
 ## 1. 创建项目
 
 使用 Spring Boot 3.4+、Java 21，例如工程名 `sms-demo-springboot`。

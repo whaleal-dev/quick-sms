@@ -2,6 +2,8 @@
 
 不依赖 Spring，用工厂 / Builder 发信。
 
+> 💡 如果你的系统不止 Java 一种语言，或者不想自己维护多家渠道，可以看[官方托管平台 Whaleal SMS](../platform/overview.md) —— 一套 HTTP API 对所有语言通用。
+
 ## 1. 依赖
 
 ```xml

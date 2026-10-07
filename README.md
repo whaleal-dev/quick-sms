@@ -1,5 +1,5 @@
 <p align="center"><img src="https://capsule-render.vercel.app/api?type=waving&color=0:6A5ACD,100:2E86C1&height=180&section=header&text=Quick%20SMS&fontSize=46&fontColor=ffffff&animation=fadeIn&desc=Multi-vendor%20SMS%20SDK%20for%20JDK%2021&descAlignY=68" alt="Quick SMS banner" /></p>
-<p align="center"><a href="https://search.maven.org/artifact/com.whaleal/sms-all"><img src="https://img.shields.io/maven-central/v/com.whaleal/sms-all?color=2E86C1&label=Maven%20Central" alt="Maven Central" /></a> <a href="https://whaleal.com/quick-sms/"><img src="https://img.shields.io/badge/Docs-whaleal.com%2Fquick--sms-0A7EA4" alt="Docs" /></a> <a href="https://www.apache.org/licenses/LICENSE-2.0.txt"><img src="https://img.shields.io/badge/License-Apache%202.0-1F6FEB" alt="License" /></a> <img src="https://img.shields.io/badge/JDK-21-2EA043" alt="JDK 21" /> <img src="https://img.shields.io/badge/Spring%20Boot-3.4-6DB33F" alt="Spring Boot 3.4" /> <a href="https://github.com/whaleal-dev/quick-sms/actions"><img src="https://img.shields.io/github/actions/workflow/status/whaleal-dev/quick-sms/ci.yml?branch=main&label=CI" alt="CI" /></a> <a href="https://github.com/whaleal-dev/quick-sms/stargazers"><img src="https://img.shields.io/github/stars/whaleal-dev/quick-sms?style=flat&color=yellow" alt="GitHub stars" /></a></p>
+<p align="center"><a href="https://search.maven.org/artifact/com.whaleal/sms-all"><img src="https://img.shields.io/maven-central/v/com.whaleal/sms-all?color=2E86C1&label=Maven%20Central" alt="Maven Central" /></a> <a href="https://docs.whaleal.com/quick-sms/"><img src="https://img.shields.io/badge/Docs-docs.whaleal.com%2Fquick--sms-0A7EA4" alt="Docs" /></a> <a href="https://www.apache.org/licenses/LICENSE-2.0.txt"><img src="https://img.shields.io/badge/License-Apache%202.0-1F6FEB" alt="License" /></a> <img src="https://img.shields.io/badge/JDK-21-2EA043" alt="JDK 21" /> <img src="https://img.shields.io/badge/Spring%20Boot-3.4-6DB33F" alt="Spring Boot 3.4" /> <a href="https://github.com/whaleal-dev/quick-sms/actions"><img src="https://img.shields.io/github/actions/workflow/status/whaleal-dev/quick-sms/ci.yml?branch=main&label=CI" alt="CI" /></a> <a href="https://github.com/whaleal-dev/quick-sms/stargazers"><img src="https://img.shields.io/github/stars/whaleal-dev/quick-sms?style=flat&color=yellow" alt="GitHub stars" /></a></p>
 
 # Quick SMS
 
@@ -29,7 +29,27 @@ Quick SMS 的目标是：
 - **SaaS 友好**：**不强制 yml**，凭证在调用时动态传入，适合多租户
 - **网关级能力**：回执 / 上行 / 状态查询 SPI、通道 failover、Webhook 安全、限流黑名单
 
-📚 **完整文档：** [文档站](https://whaleal.com/quick-sms/) · 源码 [`docs-site/`](docs-site/README.md) · Markdown 速查 [`docs/`](docs/README.md)
+📚 **完整文档：** [文档站](https://docs.whaleal.com/quick-sms/) · 源码 [`docs-site/`](docs-site/README.md) · Markdown 速查 [`docs/`](docs/README.md)
+
+---
+
+## 不想自己维护通道？用托管平台
+
+[**Whaleal SMS**](https://sms.whaleal.com) 是同一套引擎的**托管交付形态**：把你在多家 CPaaS 的账号收进一个后台，向上暴露一套 HTTP API。
+
+| | Quick SMS（本仓库） | Whaleal SMS（平台） |
+|---|---|---|
+| 形态 | 开源 SDK，嵌进你的进程 | 托管 SaaS，控制台 + HTTP API |
+| 聚合与路由 | 代码里配置 failover | 控制台点选绑定，权重/优先级实时可调，**不用发版** |
+| 观测 | 自接 `SmsMetrics` | 全渠道统一日志、报表、路由链可视化 |
+| 资费 | 短信费付给你的 CPaaS | 同上，**平台不经手资费**（BYOL，纯订阅不按条计费） |
+
+- 平台总览与选型：[文档站 · Whaleal SMS 云平台](https://docs.whaleal.com/quick-sms/docs/platform/overview)
+- 五步接入：[接入方式总览](https://docs.whaleal.com/quick-sms/docs/platform/getting-started) · 控制台各页说明：[控制台使用指南](https://docs.whaleal.com/quick-sms/docs/platform/console)
+- 开放 API：[接口参考](https://docs.whaleal.com/quick-sms/docs/platform/open-api) · 基址 `https://smsapi.whaleal.com/open/v1`
+- 已上线与规划中的能力：[能力路线图](https://docs.whaleal.com/quick-sms/docs/platform/roadmap)
+
+> 平台是**叠加的管理层**，不是 CPaaS 替代品：不售卖短信、不经手资费、不承诺送达、不改变底层链路。你的供应商合同、号码与资费全部保留。
 
 ---
 

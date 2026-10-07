@@ -24,6 +24,20 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
+      label: 'Whaleal SMS 云平台',
+      items: [
+        'platform/overview',
+        'platform/getting-started',
+        'platform/console',
+        'platform/open-api',
+        'platform/callback',
+        'platform/plans',
+        'platform/roadmap',
+        'platform/faq',
+      ],
+    },
+    {
+      type: 'category',
       label: '使用指南',
       items: [
         'guide/features',
