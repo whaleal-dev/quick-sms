@@ -1,6 +1,7 @@
 package com.whaleal.ark.cloud.third.sms.provider;
 
 import com.whaleal.ark.cloud.third.sms.config.SmsProviderConfig;
+import com.whaleal.ark.cloud.third.sms.provider.aws.AwsSnsReceiptParser;
 import com.whaleal.ark.cloud.third.sms.provider.infobip.InfobipReceiptParser;
 import com.whaleal.ark.cloud.third.sms.provider.twilio.TwilioReceiptParser;
 import com.whaleal.ark.cloud.third.sms.provider.vonage.VonageReceiptParser;
@@ -14,6 +15,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * 回执解析器一致性测试：载荷取自厂商真实 DR webhook 文档格式。
@@ -23,6 +25,7 @@ class ReceiptParserConsistencyTest {
     private final InfobipReceiptParser infobip = new InfobipReceiptParser();
     private final VonageReceiptParser vonage = new VonageReceiptParser();
     private final TwilioReceiptParser twilio = new TwilioReceiptParser();
+    private final AwsSnsReceiptParser aws = new AwsSnsReceiptParser();
     private final SmsProviderConfig config = new SmsProviderConfig();
 
     @Test
@@ -188,5 +191,78 @@ class ReceiptParserConsistencyTest {
         assertEquals("SM8f10c9c24c9f4beab57be35d1e2f8d1f", r.getMessageId());
         assertEquals(SmsReceipt.ReceiptStatus.DELIVERED, r.getReceiptStatus());
         assertNotNull(r.getProviderType());
+    }
+
+    @Test
+    void awsSnsDeliveryStatusRecord() {
+        // AWS 官方文档形状（CloudWatch Logs 的 SNS 短信投递状态记录）：
+        // 短信 id 在 notification.messageId（不是顶层），状态是顶层 status=SUCCESS/FAILURE
+        String success = """
+                {"notification":{"messageId":"34d9b400-c6dd-5444-820d-fbeb0f1f54cf",
+                                 "timestamp":"2016-06-28 00:40:34.558"},
+                 "delivery":{"destination":"+14155550123","phoneCarrier":"My Phone Carrier",
+                             "providerResponse":"Message has been accepted by phone carrier",
+                             "priceInUSD":0.00645,"dwellTimeMs":599},
+                 "status":"SUCCESS"}
+                """;
+        @SuppressWarnings("unchecked")
+        Map<String, Object> raw = JSON.parseObject(success, Map.class);
+        SmsReceipt ok = aws.parse(raw, config);
+        assertEquals("34d9b400-c6dd-5444-820d-fbeb0f1f54cf", ok.getMessageId());
+        assertEquals("+14155550123", ok.getTo());
+        assertEquals(SmsReceipt.ReceiptStatus.DELIVERED, ok.getReceiptStatus());
+        assertEquals("SUCCESS", ok.getReceiptCode());
+
+        String failure = """
+                {"notification":{"messageId":"1077257a-92f3-5ca3-bc97-6a915b310625",
+                                 "timestamp":"2016-06-28 00:40:34.559"},
+                 "delivery":{"destination":"+14155550123","mnc":0,"mcc":0,
+                             "providerResponse":"Unknown error attempting to reach phone",
+                             "dwellTimeMs":1420},
+                 "status":"FAILURE"}
+                """;
+        @SuppressWarnings("unchecked")
+        Map<String, Object> raw2 = JSON.parseObject(failure, Map.class);
+        SmsReceipt bad = aws.parse(raw2, config);
+        assertEquals("1077257a-92f3-5ca3-bc97-6a915b310625", bad.getMessageId());
+        assertEquals(SmsReceipt.ReceiptStatus.UNDELIVERABLE, bad.getReceiptStatus());
+        assertEquals("Unknown error attempting to reach phone", bad.getErrorDescription());
+    }
+
+    @Test
+    void awsNeverClaimsDeliveredWithoutASuccessSignal() {
+        // 🔴 回归（本类此前的缺陷：**无条件**返回 DELIVERED，一个字段都不看）。
+        // SNS HTTP(S) 订阅转发时，最外层是信封（Type/MessageId/Message…），真正的状态在
+        // Message 字符串里。本类**不解包**（那取决于客户怎么接线），所以必须判 UNKNOWN ——
+        // 关键是「不得再默认已送达」。
+        Map<String, Object> envelope = Map.of(
+                "Type", "Notification",
+                "MessageId", "e0b1a2c3-envelope-id",
+                "TopicArn", "arn:aws:sns:us-east-1:1111111111:sms-delivery",
+                "Message", "{\"notification\":{\"messageId\":\"x\"},\"status\":\"FAILURE\"}");
+        assertEquals(SmsReceipt.ReceiptStatus.UNKNOWN, aws.parse(envelope, config).getReceiptStatus());
+
+        // 只有 id、没有状态 —— 也不得判已送达
+        assertEquals(SmsReceipt.ReceiptStatus.UNKNOWN,
+                aws.parse(Map.of("MessageId", "only-an-id"), config).getReceiptStatus());
+
+        // 空/无数据：返回 null，不产出任何回执
+        assertNull(aws.parse(null, config));
+        assertNull(aws.parse(Map.of(), config));
+    }
+
+    @Test
+    void awsStatusWordsAreLocaleIndependent() {
+        // 状态词是 ASCII，必须走 Locale.ROOT（tr_TR 下 "SUCCESS".toLowerCase() 会变形）
+        Locale original = Locale.getDefault();
+        try {
+            Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+            assertEquals(SmsReceipt.ReceiptStatus.DELIVERED,
+                    aws.parse(Map.of("status", "SUCCESS"), config).getReceiptStatus());
+            assertEquals(SmsReceipt.ReceiptStatus.UNDELIVERABLE,
+                    aws.parse(Map.of("status", "FAILURE"), config).getReceiptStatus());
+        } finally {
+            Locale.setDefault(original);
+        }
     }
 }

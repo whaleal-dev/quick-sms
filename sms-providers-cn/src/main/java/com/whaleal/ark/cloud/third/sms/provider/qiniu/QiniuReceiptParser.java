@@ -6,6 +6,7 @@ import com.whaleal.ark.cloud.third.sms.receipt.entity.SmsReceipt;
 import com.whaleal.ark.cloud.third.sms.receipt.parser.ReceiptParser;
 
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -40,12 +41,16 @@ public class QiniuReceiptParser implements ReceiptParser {
         if (status == null) {
             return SmsReceipt.ReceiptStatus.UNKNOWN;
         }
-        String s = status.toLowerCase();
+        String s = status.toLowerCase(Locale.ROOT);
+        // 🔴 否定词必须先判：子串 "deliv" 同时命中 "undeliv" 与 "not_delivered"，
+        //    排在成功分支之后会把「投递失败」判成「已送达」—— 而平台侧 delivered/failed
+        //    是终态闸门，误报终态不可恢复（真失败被永久挡住）。
+        if (s.contains("fail") || s.contains("undeliv") || s.contains("notdeliv")
+                || s.contains("not_deliver") || s.contains("error")) {
+            return SmsReceipt.ReceiptStatus.FAILED;
+        }
         if (s.contains("success") || s.contains("deliv") || "0".equals(s) || "true".equals(s)) {
             return SmsReceipt.ReceiptStatus.DELIVERED;
-        }
-        if (s.contains("fail") || s.contains("undeliv") || s.contains("error")) {
-            return SmsReceipt.ReceiptStatus.FAILED;
         }
         if (s.contains("reject")) {
             return SmsReceipt.ReceiptStatus.REJECTED;
