@@ -123,3 +123,40 @@ jobs:
           MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+
+      # ── 诊断（2026-10-09 起备用）────────────────────────────────────────────
+      # 起因：Central 校验报 `Bundle has content that does NOT have a .pom file`
+      # 且一次列出全部 8 个 artifactId；但同 commit 的 GitHub Packages 发布正常，
+      # workflow/pom 与上一次成功发布 byte 级相同，CI 日志里看不出包里多了什么。
+      #
+      # 另一个可疑点：日志里两处 bundle 路径不一致 ——
+      #   Created bundle successfully …/target/central-staging/central-bundle.zip
+      #   Going to upload               …/target/central-publishing/central-bundle.zip
+      # 所以两个路径都收，若两者内容不同，那本身就是答案。
+      #
+      # 必须在 Deploy 失败时也执行 ⇒ 用 if: always()。
+      - name: 列出 Central bundle 内容（诊断）
+        if: always()
+        run: |
+          set -uo pipefail
+          for z in target/central-publishing/central-bundle.zip target/central-staging/central-bundle.zip; do
+            if [ ! -f "$z" ]; then
+              echo "::warning::找不到 $z"
+              continue
+            fi
+            echo "==================== $z  ($(stat -c%s "$z") bytes) ===================="
+            unzip -l "$z"
+            echo "---- 非 <artifactId>/<version>/<artifactId>-<version>.* 形状的条目 ----"
+            unzip -Z1 "$z" | grep -vE '^com/whaleal/[^/]+/[^/]+/[^/]+$' || echo "(无)"
+          done
+
+      - name: 上传 Central bundle（诊断）
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: central-bundle
+          path: |
+            target/central-publishing/central-bundle.zip
+            target/central-staging/central-bundle.zip
+          if-no-files-found: warn
+          retention-days: 14
