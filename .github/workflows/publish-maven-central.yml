@@ -82,16 +82,25 @@ jobs:
           gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
+      # ⚠️ 全程用 ./mvnw（`.mvn/wrapper/maven-wrapper.properties` 锁 Maven 3.9.9），
+      # 不用 runner 内置的 mvn。2026-10-09 的 `Bundle has content that does NOT have a .pom file`
+      # 就是 runner 镜像滚动带来的 Maven 版本变化引起的：插件建包时会往 staging 里写
+      # `com/whaleal/<artifactId>/maven-metadata-*.xml`，而它自带的清理只删
+      # `maven-metadata-central-staging.xml` 这个名字；新版 Maven 写出的是
+      # `maven-metadata-local.xml`，清理不匹配 ⇒ 8 个 artifactId 层残留被判定为
+      # 「有内容、无 .pom」⇒ 整包 FAILED。同一份代码 + 同一份配置，本机 Maven 3.9.9
+      # 产出干净包（8 行 cleanup），CI 跑内置 Maven 产出脏包（0 行 cleanup）。
+      # 详见 CHANGELOG / docs。
       - name: Set project version
         run: |
-          mvn -B -ntp versions:set \
+          ./mvnw -B -ntp versions:set \
             -DnewVersion="${{ steps.ver.outputs.version }}" \
             -DgenerateBackupPoms=false \
             -DprocessAllModules=true
 
       - name: Run tests
         if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.skip_tests != 'true' }}
-        run: mvn -B -ntp clean verify
+        run: ./mvnw -B -ntp clean verify
 
       # Maven Central 同版本永久不可覆盖。发布前探测 repo1.maven.org：
       # 全部构件已存在 → 跳过 deploy（避免重推 release-* 分支时挂红）；
@@ -118,7 +127,7 @@ jobs:
 
       - name: Deploy to Maven Central
         if: ${{ steps.detect.outputs.need_deploy == '1' }}
-        run: mvn -B -ntp -DskipTests -Pcentral clean deploy
+        run: ./mvnw -B -ntp -DskipTests -Pcentral clean deploy
         env:
           MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
