@@ -8,6 +8,8 @@ import com.whaleal.ark.cloud.third.sms.receipt.entity.SmsReceipt;
 import com.alibaba.fastjson2.JSON;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -119,6 +121,59 @@ class ReceiptParserConsistencyTest {
         SmsReceipt r2 = vonage.parse(raw2, config);
         assertEquals(SmsReceipt.ReceiptStatus.DELIVERED, r2.getReceiptStatus());
         assertEquals("0A0000000123ABCD", r2.getMessageId());
+    }
+
+    @Test
+    void vonageFlatSubmittedIsNotDelivered() {
+        // 生产实录（2026-10-09 04:19:47 UTC）：Vonage 在短信发出 0.67s 后就推了这条
+        // status=submitted 的回调，当时被映射成 DELIVERED ⇒ 每条短信被提前宣告「已送达」，
+        // 且平台终态闸门永久挡住后续真实的 rejected/undeliverable。
+        // submitted 是 Vonage SMS 生命周期的正常首条回调（accepted → submitted → delivered）。
+        String payload = """
+                {"message_uuid":"7cf2e7b6-3473-431e-a96b-dea3328c3fb7",
+                 "to":"8613391115462","from":"Whaleal",
+                 "timestamp":"2026-10-09T04:19:47.000Z",
+                 "status":"submitted",
+                 "usage":{"price":"0.0333","currency":"EUR"}}
+                """;
+        @SuppressWarnings("unchecked")
+        Map<String, Object> raw = JSON.parseObject(payload, Map.class);
+        SmsReceipt r = vonage.parse(raw, config);
+
+        assertEquals("7cf2e7b6-3473-431e-a96b-dea3328c3fb7", r.getMessageId());
+        assertEquals("8613391115462", r.getTo());
+        assertEquals(SmsReceipt.ReceiptStatus.SENT, r.getReceiptStatus());
+        // 原始状态必须原样保留：平台侧靠它落库 rawStatus，是事后唯一能看出
+        // 「解析结果与供应商原话不一致」的证据。
+        assertEquals("submitted", r.getReceiptCode());
+    }
+
+    @Test
+    void vonageFlatAndTypedBranchesAgreeOnTheSameWord() {
+        // 同一语义、两种 key 形状（旧 SMS API DLR 的扁平 status vs Messages API v1 的
+        // type=message.xxx）必须给出同一个枚举值。2026-10-09 的生产事故正是这两条分支
+        // 对 submitted/accepted 的口径不一致造成的——扁平分支把它们当终态，typed 分支当中间态。
+        for (String word : List.of("delivered", "accepted", "submitted",
+                "rejected", "undeliverable", "expired")) {
+            SmsReceipt flat = vonage.parse(Map.of("message_uuid", "u-1", "status", word), config);
+            SmsReceipt typed = vonage.parse(Map.of("message_uuid", "u-1", "type", "message." + word), config);
+            assertEquals(typed.getReceiptStatus(), flat.getReceiptStatus(),
+                    "扁平 status=" + word + " 与 type=message." + word + " 的映射必须一致");
+        }
+    }
+
+    @Test
+    void vonageStatusParsingIsLocaleIndependent() {
+        // 状态词是 ASCII：默认 locale 为 tr_TR 时 "SUBMITTED".toLowerCase() 得到
+        // "submıtted"（无点 i），所有 case 落空 ⇒ 静默退化成 UNKNOWN。必须走 Locale.ROOT。
+        Locale original = Locale.getDefault();
+        try {
+            Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+            SmsReceipt r = vonage.parse(Map.of("message_uuid", "u-2", "status", "SUBMITTED"), config);
+            assertEquals(SmsReceipt.ReceiptStatus.SENT, r.getReceiptStatus());
+        } finally {
+            Locale.setDefault(original);
+        }
     }
 
     @Test

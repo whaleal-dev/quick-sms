@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.0.3 — 待发布
+
+### Fixed
+- **Vonage 回执状态误映射（严重）**：扁平分支把中间态 `submitted` / `accepted` 当成终态
+  `DELIVERED`。Vonage 在短信发出后**亚秒级**就推第一条 `status=submitted` 的回调
+  （生命周期 `accepted → submitted → delivered`），于是每条短信都被提前宣告「已送达」；
+  而 Whaleal SMS 平台以 `delivered` / `failed` 为终态闸门（`applyReceiptUnlessTerminal`），
+  真实到达的 `rejected` / `undeliverable` / `expired` 会被**永久挡住**
+  ⇒ 真失败的消息永远报「已送达」，且错误终态已推给客户回调。
+  现与 `type=message.submitted` 分支保持同义（→ `SENT`）。
+  2026-10-09 生产实录：短信发出 0.67s 后 `receipt applied: submitted -> delivered (raw=submitted)`。
+- Vonage 状态解析改用 `Locale.ROOT`：默认 locale 为 `tr_TR` 时 `"SUBMITTED".toLowerCase()`
+  得到 `submıtted`（无点 i），所有 case 落空、静默退化为 `UNKNOWN`。
+
+### Tests
+- `ReceiptParserConsistencyTest` 新增 3 例：扁平 `submitted` 不得判终态；扁平 `status` 与
+  `type=message.xxx` 两种 key 形状对同一状态词必须映射一致；状态解析与默认 locale 无关。
+
 ## Unreleased
 
 ### Changed

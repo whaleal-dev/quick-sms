@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -58,9 +59,13 @@ public class VonageReceiptParser implements ReceiptParser {
         if (status == null) {
             return SmsReceipt.ReceiptStatus.UNKNOWN;
         }
+        // 供应商状态词全是 ASCII：必须用 Locale.ROOT。tr_TR 下 "SUBMITTED".toLowerCase()
+        // 得到 "submıtted"（无点 i），所有 case 全部落空 ⇒ 静默退化成 UNKNOWN。
+        String normalized = status.toLowerCase(Locale.ROOT);
+
         // Messages API v1：type = message.delivered / message.undeliverable / message.rejected / message.expired
-        if (status.toLowerCase().startsWith("message.")) {
-            return switch (status.toLowerCase().substring("message.".length())) {
+        if (normalized.startsWith("message.")) {
+            return switch (normalized.substring("message.".length())) {
                 case "delivered" -> SmsReceipt.ReceiptStatus.DELIVERED;
                 case "undeliverable" -> SmsReceipt.ReceiptStatus.UNDELIVERABLE;
                 case "rejected" -> SmsReceipt.ReceiptStatus.REJECTED;
@@ -69,12 +74,22 @@ public class VonageReceiptParser implements ReceiptParser {
                 default -> SmsReceipt.ReceiptStatus.UNKNOWN;
             };
         }
-        return switch (status.toLowerCase()) {
-            case "delivered", "submitted", "accepted" -> SmsReceipt.ReceiptStatus.DELIVERED;
+        return switch (normalized) {
+            // 🔴 accepted / submitted 是**中间态**，不是终态，必须与上面 message. 分支同义
+            //    （那里 mapping 到 SENT）。Vonage 在发出后**亚秒级**就推第一条
+            //    status=submitted，把它映射成 DELIVERED 的后果是：
+            //    ① 每条短信都被提前宣告「已送达」；
+            //    ② 平台侧 applyReceiptUnlessTerminal 以 delivered/failed 为终态闸门，
+            //       之后真实的 rejected/undeliverable/expired 会被**永久挡住**
+            //       ⇒ 真失败的消息永远报 delivered，且错误终态已推给客户回调。
+            //    2026-10-09 生产实录（短信发出 0.67s 后）：
+            //      receipt applied: submitted -> delivered (raw=submitted)
+            case "accepted", "submitted" -> SmsReceipt.ReceiptStatus.SENT;
+            case "delivered" -> SmsReceipt.ReceiptStatus.DELIVERED;
             case "failed", "rejected", "undeliverable" ->
-                    "rejected".equalsIgnoreCase(status)
+                    "rejected".equals(normalized)
                             ? SmsReceipt.ReceiptStatus.REJECTED
-                            : "undeliverable".equalsIgnoreCase(status)
+                            : "undeliverable".equals(normalized)
                             ? SmsReceipt.ReceiptStatus.UNDELIVERABLE
                             : SmsReceipt.ReceiptStatus.FAILED;
             case "expired" -> SmsReceipt.ReceiptStatus.EXPIRED;
