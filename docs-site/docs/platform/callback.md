@@ -6,16 +6,16 @@
 
 ## 两条链路，别混
 
-平台在 `sms.whaleal.com` 和你的供应商之间有两条方向相反的回调：
+平台在 `app.whaleal.com` 和你的供应商之间有两条方向相反的回调：
 
 ```text
-   你的系统 ──①POST /open/v1/sms/send──► Whaleal SMS ──► Twilio / Vonage / Infobip ──► 用户
+   你的系统 ──①POST /open/v1/sms/send──► Whaleal Messaging ──► Twilio / Vonage / Infobip ──► 用户
                                               ▲                        │
                                               │                        │
                        ② 供应商回执地址       │                        │
                        （你填到供应商后台）    └────────────────────────┘
                        
-   你的系统 ◄──③ 状态回调地址（你填在开发者中心）── Whaleal SMS
+   你的系统 ◄──③ 状态回调地址（你填在开发者中心）── Whaleal Messaging
                         （消息到达终态时推送）
 ```
 
@@ -33,7 +33,7 @@
 1. **供应商回执地址** —— 页面会直接给出形如下面的 URL，把它填到 Twilio / Vonage / Infobip 后台的回执回调处：
 
 ```text
-https://smsapi.whaleal.com/webhook/sms/{provider}?token=<回调令牌>
+https://webhook.whaleal.com/webhook/sms/{provider}?token=<回调令牌>
 ```
 
    > 注意把 `{provider}` 换成实际供应商代码（如 `twilio`）。

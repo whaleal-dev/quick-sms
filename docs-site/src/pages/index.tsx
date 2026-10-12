@@ -10,7 +10,7 @@ import styles from './index.module.css';
 
 const quickRoutes = [
   {
-    title: 'Whaleal SMS 云平台',
+    title: 'Whaleal Messaging 云平台',
     description: '不想自己维护通道？托管式多渠道中转平台：一套 API、聚合路由、统一观测。',
     to: '/docs/platform/overview',
   },
@@ -52,7 +52,7 @@ function HomepageHeader() {
           <Link
             className="button button--info button--lg margin-left--md"
             to="/docs/platform/overview">
-            用 Whaleal SMS 云平台
+            用 Whaleal Messaging 云平台
           </Link>
         </div>
       </div>
@@ -68,7 +68,7 @@ function QuickNavigation() {
           按任务进入
         </Heading>
         <p className={styles.quickRoutesIntro}>
-          Quick SMS 统一封装多厂商短信 API；不想自己维护通道，可以直接用官方的 Whaleal SMS 云平台。
+          Quick SMS 统一封装多厂商短信 API；不想自己维护通道，可以直接用官方的 Whaleal Messaging 云平台。
         </p>
         <div className={styles.quickRouteGrid}>
           {quickRoutes.map((route) => (

@@ -1,10 +1,10 @@
-# Whaleal SMS 云平台
+# Whaleal Messaging 云平台
 
-> 这一章介绍 **Whaleal SMS** —— 一个托管式**多渠道短信中转平台**：把你在各家 CPaaS 的账号聚合成一套统一 API、一个统一后台。
+> 这一章介绍 **Whaleal Messaging** —— 一个托管式**多渠道短信中转平台**：把你在各家 CPaaS 的账号聚合成一套统一 API、一个统一后台。
 >
-> - 控制台：[sms.whaleal.com](https://sms.whaleal.com)
-> - 开放 API：`https://smsapi.whaleal.com/open/v1`
-> - 线上 API 参考：[sms.whaleal.com/developers/api](https://sms.whaleal.com/developers/api)
+> - 控制台：[app.whaleal.com](https://app.whaleal.com)
+> - 开放 API：`https://api.whaleal.com/open/v1`
+> - 线上 API 参考：[app.whaleal.com/developers/api](https://app.whaleal.com/developers/api)
 
 ## 这一章讲什么
 
@@ -18,13 +18,13 @@
 - 出了故障要挨个登录各家后台看日志 —— **排障要在多个控制台之间来回核对**
 - 密钥散落在各服务的配置文件里 —— **轮换一次密钥，改动面铺满整个仓库**
 
-**Whaleal SMS 就是为这些「第二层问题」准备的。** 它把底层 CPaaS 账号收进一个平台，向上暴露一套 API、一个后台、一份日志、一处分发规则。
+**Whaleal Messaging 就是为这些「第二层问题」准备的。** 它把底层 CPaaS 账号收进一个平台，向上暴露一套 API、一个后台、一份日志、一处分发规则。
 
 ## 和 Quick SMS 的关系
 
 两个产品是**同一套引擎的两种交付形态**，不是两套并行实现：
 
-| | Quick SMS（SDK） | Whaleal SMS（云平台） |
+| | Quick SMS（SDK） | Whaleal Messaging（云平台） |
 |---|---|---|
 | 形态 | 开源 SDK，嵌进你的进程 | 托管 SaaS，跑在我们的服务器上 |
 | 你要提供 | 各家厂商的密钥 | 各家厂商的密钥（BYOL，仍然是你自己的账号） |
@@ -99,7 +99,7 @@
 
 ```text
    订单系统 ──┐
-   会员系统 ──┼──► Whaleal SMS ──► 各 CPaaS 账号（同一个集团的采购）
+   会员系统 ──┼──► Whaleal Messaging ──► 各 CPaaS 账号（同一个集团的采购）
    客服系统 ──┘         ▲
                         └─ 一套日志 / 一份报表 / 一个限速池
 ```

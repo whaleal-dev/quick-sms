@@ -1,21 +1,21 @@
 # 开放 API 参考
 
-Whaleal SMS 对业务系统暴露的全部接口就是三个。它们都被冻结成契约，由平台侧的单测锁形状（响应字段、字段类型都不可随意改动），因此可以放心接入。
+Whaleal Messaging 对业务系统暴露的全部接口就是三个。它们都被冻结成契约，由平台侧的单测锁形状（响应字段、字段类型都不可随意改动），因此可以放心接入。
 
 ## 基址 {#base-url}
 
 ```
-https://smsapi.whaleal.com/open/v1
+https://api.whaleal.com/open/v1
 ```
 
 > ⚠️ **别把两个域名搞混**，这是接入时最容易踩的坑：
 >
 > | 域名 | 是什么 | 能不能调 API |
 > |---|---|---|
-> | `sms.whaleal.com` | 控制台 + 官网（前端静态站） | ❌ **不能**。它是 SPA，任意路径都会回落到首页 HTML |
-> | `smsapi.whaleal.com` | 后端开放 API | ✅ 只有这个域名是接口 |
+> | `app.whaleal.com` | 控制台 + 官网（前端静态站） | ❌ **不能**。它是 SPA，任意路径都会回落到首页 HTML |
+> | `api.whaleal.com` | 后端开放 API | ✅ 只有这个域名是接口 |
 >
-> 如果往 `sms.whaleal.com/open/v1/...` 发请求，你会拿到一段 HTML 而不是 JSON —— 那不是接口报错，是域名用错了。
+> 如果往 `app.whaleal.com/open/v1/...` 发请求，你会拿到一段 HTML 而不是 JSON —— 那不是接口报错，是域名用错了。
 
 ## 鉴权
 
@@ -90,7 +90,7 @@ Content-Type: application/json
 **示例**
 
 ```bash
-curl -X POST https://smsapi.whaleal.com/open/v1/sms/send \
+curl -X POST https://api.whaleal.com/open/v1/sms/send \
   -H "Authorization: Bearer sk_xxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{
@@ -162,7 +162,7 @@ GET /open/v1/sms/{messageId}
 | `rejected` | 被拒绝（供应商拒收，`errorCode` 携带原因） |
 
 ```bash
-curl https://smsapi.whaleal.com/open/v1/sms/6a1f9c8e2b... \
+curl https://api.whaleal.com/open/v1/sms/6a1f9c8e2b... \
   -H "Authorization: Bearer sk_xxxxxxxx"
 ```
 
@@ -228,7 +228,7 @@ String key = System.getenv("SMS_API_KEY");
 
 接口定义在平台后端源码中有对应实现与契约测试：控制器 `OpenSmsController`、鉴权 `ApiKeyAuthFilter`、发送核 `SendService`、回调 `CallbackPusher`、形状锁 `OpenApiShapeTest`。**接口行为变更必须同步更新文档**，所以这里写的就是线上跑的。
 
-线上版（可分享给同事）：[sms.whaleal.com/developers/api](https://sms.whaleal.com/developers/api)
+线上版（可分享给同事）：[app.whaleal.com/developers/api](https://app.whaleal.com/developers/api)
 
 ---
 

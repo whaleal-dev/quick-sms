@@ -24,7 +24,7 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
-      label: 'Whaleal SMS 云平台',
+      label: 'Whaleal Messaging 云平台',
       items: [
         'platform/overview',
         'platform/getting-started',

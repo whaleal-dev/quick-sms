@@ -1,8 +1,8 @@
 # 控制台使用指南
 
-控制台是 Whaleal SMS 的操作面：登录后可手工发信、看全渠道日志、管渠道与密钥、查用量。这一页按侧边栏分组逐块讲清楚**每个页面解决什么问题**。
+控制台是 Whaleal Messaging 的操作面：登录后可手工发信、看全渠道日志、管渠道与密钥、查用量。这一页按侧边栏分组逐块讲清楚**每个页面解决什么问题**。
 
-登录入口 [sms.whaleal.com](https://sms.whaleal.com)，走 **Whaleal IDP** 统一身份，首次登录即建租户。
+登录入口 [app.whaleal.com](https://app.whaleal.com)，走 **Whaleal IDP** 统一身份，首次登录即建租户。
 
 ## 侧边栏导览
 

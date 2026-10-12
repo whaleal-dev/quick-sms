@@ -19,7 +19,7 @@
 | [厂商接入说明](providers.md) | 每家凭证、模板/内容、回调字段 |
 | [CI / CD](ci-cd.md) | Maven Central 发布（`release-*`） |
 
-## Whaleal SMS 云平台
+## Whaleal Messaging 云平台
 
 **托管式多渠道短信中转平台**（BYOL：用你自己的 CPaaS 账号，平台不经手资费）。文档站章节：
 
@@ -34,7 +34,7 @@
 | [能力路线图](https://docs.whaleal.com/quick-sms/docs/platform/roadmap) | 已上线能力与规划中的能力 |
 | [常见问题](https://docs.whaleal.com/quick-sms/docs/platform/faq) | 排错与对外口径 |
 
-控制台：<https://sms.whaleal.com> · 开放 API 基址：`https://smsapi.whaleal.com/open/v1`
+控制台：<https://app.whaleal.com> · 开放 API 基址：`https://api.whaleal.com/open/v1`
 
 文档站额外提供通用短信技术说明：**出站 · 入站 · Report · Webhook**。
 

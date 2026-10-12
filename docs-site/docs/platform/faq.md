@@ -25,7 +25,7 @@
 
 **Q：接口一直返回 HTML，不是 JSON？**
 
-域名用错了。接口只在 `smsapi.whaleal.com`；`sms.whaleal.com` 是前端站点，任意路径都会回落到首页 HTML。见 [基址说明](open-api.md#base-url)。
+域名用错了。接口只在 `api.whaleal.com`；`app.whaleal.com` 是前端站点，任意路径都会回落到首页 HTML。见 [基址说明](open-api.md#base-url)。
 
 **Q：密钥正确但发信被拒，返回 `40000`？**
 
@@ -53,7 +53,7 @@
 
 | 业务码 | HTTP | 常见原因 | 处理 |
 |---|---|---|---|
-| — | 200 但不是 JSON | 域名用了 `sms.whaleal.com` | 换成 `smsapi.whaleal.com` |
+| — | 200 但不是 JSON | 域名用了 `app.whaleal.com` | 换成 `api.whaleal.com` |
 | `40100` | 401 | 没带密钥 / 密钥被禁用 / 抄漏了字符 | 检查 `Authorization` 头；必要时重新签发 |
 | `40000` | 400 | 密钥未绑定渠道、无 ACTIVE 渠道、参数缺失、号码格式不对 | 按"接入"一节逐项排查 |
 | `40300` | 403 | 租户被限制 | 联系支持 |
@@ -106,11 +106,11 @@ AES 加密存储，**永不回显完整密钥**（页面上只能看到前缀）
 
 | 资源 | 地址 |
 |---|---|
-| 控制台 | [sms.whaleal.com](https://sms.whaleal.com) |
-| 线上 API 参考（可分享） | [sms.whaleal.com/developers/api](https://sms.whaleal.com/developers/api) |
-| 开发者页（多语言示例） | [sms.whaleal.com/developers](https://sms.whaleal.com/developers) |
-| 定价 | [sms.whaleal.com/pricing](https://sms.whaleal.com/pricing) |
-| 帮助中心 | [sms.whaleal.com/help](https://sms.whaleal.com/help) |
+| 控制台 | [app.whaleal.com](https://app.whaleal.com) |
+| 线上 API 参考（可分享） | [app.whaleal.com/developers/api](https://app.whaleal.com/developers/api) |
+| 开发者页（多语言示例） | [app.whaleal.com/developers](https://app.whaleal.com/developers) |
+| 定价 | [app.whaleal.com/pricing](https://app.whaleal.com/pricing) |
+| 帮助中心 | [app.whaleal.com/help](https://app.whaleal.com/help) |
 | Quick SMS SDK 文档 | [本站](../intro.md) · [GitHub](https://github.com/whaleal-dev/quick-sms) |
 
 ---

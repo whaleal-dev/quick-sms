@@ -2,12 +2,12 @@
 
 ## 成本口径：先分清两笔钱
 
-接入 Whaleal SMS 会涉及**两笔完全独立的费用**，务必先跟团队对齐，避免对外说错：
+接入 Whaleal Messaging 会涉及**两笔完全独立的费用**，务必先跟团队对齐，避免对外说错：
 
 | 费用 | 付给谁 | 怎么算 |
 |---|---|---|
 | **短信费** | 底层供应商（Twilio / Vonage / Infobip…） | 由供应商**直接按你自己的账号资费计费**。平台不经手、不加价、不抽成 |
-| **平台订阅费** | Whaleal SMS | 按**渠道数档位**收，**不按短信条数** |
+| **平台订阅费** | Whaleal Messaging | 按**渠道数档位**收，**不按短信条数** |
 
 也就是说：**平台没有「按条平台税」**。你发 1 万条还是 100 万条，订阅费不变 —— 分档差异只在渠道数、提交速率和日志保留期。
 
@@ -57,7 +57,7 @@
 ## 用量对账：两个口径必然不等 {#usage-reconcile}
 
 ```bash
-curl https://smsapi.whaleal.com/open/v1/usage \
+curl https://api.whaleal.com/open/v1/usage \
   -H "Authorization: Bearer sk_xxxxxxxx"
 ```
 

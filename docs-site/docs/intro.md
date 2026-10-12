@@ -28,11 +28,11 @@ Quick SMS 希望把这些重复劳动收敛成一套 **统一 API + 可插拔厂
 - **动态凭证**：默认代码 / 请求传密钥，贴合多租户网关，不强制配置文件
 - **全链路回调**：回执 / 上行 SPI 为一等能力，而不只是「能发出去」
 
-## 官方托管平台：Whaleal SMS
+## 官方托管平台：Whaleal Messaging
 
-Quick SMS 是 **SDK** —— 通道、密钥、回调、日志都在你自己的进程里。如果你更希望**把多家供应商收进一个后台统一管理**，官方提供了托管平台 **[Whaleal SMS](https://sms.whaleal.com)**，两者是**同一套引擎的两种交付形态**（平台的多厂商发信能力由 Quick SMS 提供）：
+Quick SMS 是 **SDK** —— 通道、密钥、回调、日志都在你自己的进程里。如果你更希望**把多家供应商收进一个后台统一管理**，官方提供了托管平台 **[Whaleal Messaging](https://app.whaleal.com)**，两者是**同一套引擎的两种交付形态**（平台的多厂商发信能力由 Quick SMS 提供）：
 
-| 你关心的事 | Whaleal SMS 云平台怎么做 |
+| 你关心的事 | Whaleal Messaging 云平台怎么做 |
 |---|---|
 | 加一家渠道做灾备 | 控制台点选绑定，**权重与优先级随时可调，不用改代码发版** |
 | 多渠道分发与容灾 | 权重相等 → 顺序主备；权重不等 → 平滑加权轮询，失败自动切换 |
@@ -44,7 +44,7 @@ Quick SMS 是 **SDK** —— 通道、密钥、回调、日志都在你自己的
 - 不想自己维护通道，用平台：[平台总览与选型](./platform/overview.md)
 - 五步跑通第一条短信：[接入方式总览](./platform/getting-started.md)
 - 接口细节：[开放 API 参考](./platform/open-api.md)
-- 线上控制台：[sms.whaleal.com](https://sms.whaleal.com)
+- 线上控制台：[app.whaleal.com](https://app.whaleal.com)
 
 > 平台是**叠加的管理层**，不是 CPaaS 替代品：不售卖短信、不经手资费、不承诺送达、不改变底层链路。你的供应商合同、号码与资费全部保留，也可以随时切回 SDK 自建。
 
@@ -57,7 +57,7 @@ Quick SMS 是 **SDK** —— 通道、密钥、回调、日志都在你自己的
 
 ## 下一步
 
-1. **想直接用托管平台** → [Whaleal SMS 云平台](./platform/overview.md)（[五步接入](./platform/getting-started.md)）
+1. **想直接用托管平台** → [Whaleal Messaging 云平台](./platform/overview.md)（[五步接入](./platform/getting-started.md)）
 2. 先读 [短信概念总览](./concepts/overview.md)（出站 / 入站 / Report / Webhook）
 3. [Spring Boot 快速开始](./getting-started/quickstart-spring-boot.md)
 4. 或 [JavaSE 快速开始](./getting-started/quickstart-java.md)

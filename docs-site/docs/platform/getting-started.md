@@ -1,6 +1,6 @@
 # 接入方式总览
 
-这一章是 **Whaleal SMS 云平台**的接入总入口：先选路径，再按五步跑通第一条短信。
+这一章是 **Whaleal Messaging 云平台**的接入总入口：先选路径，再按五步跑通第一条短信。
 
 ## 三条接入路径
 
@@ -17,7 +17,7 @@
 
 ## 接入前：账号
 
-控制台地址：[sms.whaleal.com](https://sms.whaleal.com)，登录走 **Whaleal IDP**（`idp.whaleal.com`）统一身份，首次登录即建立租户，无需单独注册。
+控制台地址：[app.whaleal.com](https://app.whaleal.com)，登录走 **Whaleal IDP**（`idp.whaleal.com`）统一身份，首次登录即建立租户，无需单独注册。
 
 登录后你会看到左侧的功能区，本文涉及的主要有四个页面：
 
@@ -75,7 +75,7 @@
 用 curl 打通（把密钥和号码换成你自己的）：
 
 ```bash
-curl -X POST https://smsapi.whaleal.com/open/v1/sms/send \
+curl -X POST https://api.whaleal.com/open/v1/sms/send \
   -H "Authorization: Bearer sk_xxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{
@@ -127,7 +127,7 @@ curl -X POST https://smsapi.whaleal.com/open/v1/sms/send \
 ### 第 5 步：上线前对账
 
 ```bash
-curl https://smsapi.whaleal.com/open/v1/usage \
+curl https://api.whaleal.com/open/v1/usage \
   -H "Authorization: Bearer sk_xxxxxxxx"
 ```
 

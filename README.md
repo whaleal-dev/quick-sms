@@ -35,18 +35,18 @@ Quick SMS 的目标是：
 
 ## 不想自己维护通道？用托管平台
 
-[**Whaleal SMS**](https://sms.whaleal.com) 是同一套引擎的**托管交付形态**：把你在多家 CPaaS 的账号收进一个后台，向上暴露一套 HTTP API。
+[**Whaleal Messaging**](https://app.whaleal.com) 是同一套引擎的**托管交付形态**：把你在多家 CPaaS 的账号收进一个后台，向上暴露一套 HTTP API。
 
-| | Quick SMS（本仓库） | Whaleal SMS（平台） |
+| | Quick SMS（本仓库） | Whaleal Messaging（平台） |
 |---|---|---|
 | 形态 | 开源 SDK，嵌进你的进程 | 托管 SaaS，控制台 + HTTP API |
 | 聚合与路由 | 代码里配置 failover | 控制台点选绑定，权重/优先级实时可调，**不用发版** |
 | 观测 | 自接 `SmsMetrics` | 全渠道统一日志、报表、路由链可视化 |
 | 资费 | 短信费付给你的 CPaaS | 同上，**平台不经手资费**（BYOL，纯订阅不按条计费） |
 
-- 平台总览与选型：[文档站 · Whaleal SMS 云平台](https://docs.whaleal.com/quick-sms/docs/platform/overview)
+- 平台总览与选型：[文档站 · Whaleal Messaging 云平台](https://docs.whaleal.com/quick-sms/docs/platform/overview)
 - 五步接入：[接入方式总览](https://docs.whaleal.com/quick-sms/docs/platform/getting-started) · 控制台各页说明：[控制台使用指南](https://docs.whaleal.com/quick-sms/docs/platform/console)
-- 开放 API：[接口参考](https://docs.whaleal.com/quick-sms/docs/platform/open-api) · 基址 `https://smsapi.whaleal.com/open/v1`
+- 开放 API：[接口参考](https://docs.whaleal.com/quick-sms/docs/platform/open-api) · 基址 `https://api.whaleal.com/open/v1`
 - 已上线与规划中的能力：[能力路线图](https://docs.whaleal.com/quick-sms/docs/platform/roadmap)
 
 > 平台是**叠加的管理层**，不是 CPaaS 替代品：不售卖短信、不经手资费、不承诺送达、不改变底层链路。你的供应商合同、号码与资费全部保留。
