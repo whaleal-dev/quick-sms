@@ -19,6 +19,15 @@ npm run build
 
 推送到 `main` 后由 `.github/workflows/docs-pages.yml` 自动发布。
 
+## GA4
+
+本站已接入 GA4（与主站同一媒体资源，2026-10-18）。要点：
+
+- 实现：`src/ga/analytics.ts`（Consent Mode v2 默认拒绝 + 主机名闸门 + 手动 page_view），
+  由 `src/theme/Root.tsx` 挂载；同意横幅在 `src/components/ConsentBanner.tsx`。
+- 只有生产域名 `docs.whaleal.com` 放行：本地 dev 与 `*.github.io` 预览域不加载、不弹条。
+- **改 GA ID / 排查埋点 / 新站接入的完整口径见 `project/conventions/analytics-ga4.md`**（跨仓总台账）。
+
 ## 目录
 
 - `docs/concepts/` 出站 / 入站 / Report / Webhook 等通用短信技术
